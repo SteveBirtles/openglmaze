@@ -3,7 +3,7 @@ package main
 import (
 	_ "image/png"
 
-	"github.com/go-gl/gl/v4.1-core/gl"
+	"github.com/go-gl/gl/v3.2-core/gl"
 	"github.com/go-gl/mathgl/mgl32"
 )
 
@@ -11,7 +11,7 @@ const terminator = "\x00"
 
 var shaderProgram uint32
 
-const vertexShader = `#version 410
+const vertexShader = `#version 330
 
 uniform mat4 projection;
 uniform mat4 camera;
@@ -33,7 +33,7 @@ void main() {
 
 }`
 
-const fragmentShader = `#version 410
+const fragmentShader = `#version 330
 
 uniform sampler2D tex;
 
