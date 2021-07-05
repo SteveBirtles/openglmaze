@@ -15,7 +15,7 @@ var grid [gridSize][gridSize][gridHeight][2]uint16
 
 func loadMap() {
 
-	f1, err1 := os.Open("../supermoonengine/maps/default.map")
+	f1, err1 := os.Open("maps/default.map")
 	if err1 == nil {
 		decoder1 := gob.NewDecoder(f1)
 		err := decoder1.Decode(&grid)

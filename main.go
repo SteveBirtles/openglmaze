@@ -15,7 +15,7 @@ var (
 	frames            = 0
 	second            = time.Tick(time.Second)
 	frameLength       float64
-	windowTitlePrefix = "OpenGL SME Map Preview"
+	windowTitlePrefix = "OpenGL Maze Experiment"
 	window            *glfw.Window
 )
 
