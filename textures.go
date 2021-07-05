@@ -7,7 +7,7 @@ import (
 	"log"
 	"os"
 
-	"github.com/go-gl/gl/v4.6-core/gl"
+	"github.com/go-gl/gl/v2.1/gl"
 )
 
 var texture uint32
