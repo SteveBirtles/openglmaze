@@ -31,7 +31,7 @@ func initiateOpenGL() {
 	//glfw.WindowHint(glfw.OpenGLForwardCompatible, glfw.True)
 	glfw.WindowHint(glfw.Samples, 4)
 
-	window, err = glfw.CreateWindow(windowWidth, windowHeight, windowTitlePrefix, nil, nil)
+	window, err = glfw.CreateWindow(windowWidth, windowHeight, windowTitlePrefix, glfw.GetPrimaryMonitor(), nil)
 	if err != nil {
 		panic(err)
 	}
@@ -41,8 +41,12 @@ func initiateOpenGL() {
 		panic(err)
 	}
 
+	window.SetInputMode(glfw.CursorMode, glfw.CursorDisabled)
 	window.SetCursorPos(windowWidth/2, windowHeight/2)
-	window.SetInputMode(glfw.CursorMode, glfw.CursorHidden)
+
+	if glfw.RawMouseMotionSupported() {
+		window.SetInputMode(glfw.RawMouseMotion, glfw.True)
+	}
 
 	gl.Enable(gl.DEPTH_TEST)
 	gl.DepthFunc(gl.LESS)
