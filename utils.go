@@ -6,7 +6,7 @@ import (
 	"runtime"
 	"strings"
 
-	"github.com/go-gl/gl/v3.2-core/gl"
+	gl "github.com/go-gl/gl/v3.1/gles2"
 	"github.com/go-gl/glfw/v3.3/glfw"
 )
 
@@ -25,9 +25,10 @@ func initiateOpenGL() {
 
 	glfw.WindowHint(glfw.Resizable, glfw.False)
 	glfw.WindowHint(glfw.ContextVersionMajor, 3)
-	glfw.WindowHint(glfw.ContextVersionMinor, 2)
-	glfw.WindowHint(glfw.OpenGLProfile, glfw.OpenGLCoreProfile)
-	glfw.WindowHint(glfw.OpenGLForwardCompatible, glfw.True)
+	glfw.WindowHint(glfw.ContextVersionMinor, 1)
+
+	//glfw.WindowHint(glfw.OpenGLProfile, glfw.OpenGLCoreProfile)
+	//glfw.WindowHint(glfw.OpenGLForwardCompatible, glfw.True)
 	glfw.WindowHint(glfw.Samples, 4)
 
 	window, err = glfw.CreateWindow(windowWidth, windowHeight, windowTitlePrefix, nil, nil)
@@ -47,7 +48,7 @@ func initiateOpenGL() {
 	gl.DepthFunc(gl.LESS)
 	gl.Enable(gl.CULL_FACE)
 	gl.ClearColor(0.0, 0.0, 0.0, 1.0)
-	gl.Enable(gl.MULTISAMPLE)
+	//gl.Enable(gl.MULTISAMPLE)
 
 	var vao uint32
 	gl.GenVertexArrays(1, &vao)

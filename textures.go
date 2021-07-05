@@ -7,7 +7,7 @@ import (
 	"log"
 	"os"
 
-	"github.com/go-gl/gl/v3.2-core/gl"
+	gl "github.com/go-gl/gl/v3.1/gles2"
 )
 
 var texture uint32
@@ -47,7 +47,7 @@ func newTexture(file string) (uint32, error) {
 	gl.ActiveTexture(gl.TEXTURE0)
 	gl.BindTexture(gl.TEXTURE_2D, texture)
 	gl.TexStorage2D(gl.TEXTURE_2D, 12, gl.RGBA8, width, height)
-	gl.TexSubImage2D(gl.TEXTURE_2D, 0, 0, 0, width, height, gl.BGRA, gl.UNSIGNED_BYTE, gl.Ptr(rgba.Pix))
+	gl.TexSubImage2D(gl.TEXTURE_2D, 0, 0, 0, width, height, gl.BGRA_EXT, gl.UNSIGNED_BYTE, gl.Ptr(rgba.Pix))
 	gl.GenerateMipmap(gl.TEXTURE_2D)
 	gl.TexParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR_MIPMAP_LINEAR)
 	gl.TexParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR)

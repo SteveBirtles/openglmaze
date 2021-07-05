@@ -3,7 +3,7 @@ package main
 import (
 	_ "image/png"
 
-	"github.com/go-gl/gl/v3.2-core/gl"
+	gl "github.com/go-gl/gl/v3.1/gles2"
 	"github.com/go-gl/mathgl/mgl32"
 )
 
@@ -11,7 +11,7 @@ const terminator = "\x00"
 
 var shaderProgram uint32
 
-const vertexShader = `#version 330
+const vertexShader = `#version 300 es
 
 uniform mat4 projection;
 uniform mat4 camera;
@@ -21,8 +21,8 @@ in vec3 vertexIn;
 in vec2 texCoordIn;
 in vec3 colourIn;
 
-out vec2 texCoordForFrag;
-out vec3 colourForFrag;
+out mediump vec2 texCoordForFrag;
+out mediump vec3 colourForFrag;
 
 void main() {
 
@@ -33,14 +33,14 @@ void main() {
 
 }`
 
-const fragmentShader = `#version 330
+const fragmentShader = `#version 300 es
 
 uniform sampler2D tex;
 
-in vec2 texCoordForFrag;
-in vec3 colourForFrag;
+in mediump vec2 texCoordForFrag;
+in mediump vec3 colourForFrag;
 
-out vec4 colourOut;
+out mediump vec4 colourOut;
 
 void main() {
 
@@ -85,6 +85,6 @@ func prepareShaders() {
 	gl.EnableVertexAttribArray(colourIn)
 	gl.VertexAttribPointer(colourIn, 3, gl.FLOAT, false, 8*4, gl.PtrOffset(5*4))
 
-	gl.BindFragDataLocation(shaderProgram, 0, gl.Str("colourOut"+terminator))
+	gl.BindFragDataLocationEXT(shaderProgram, 0, gl.Str("colourOut"+terminator))
 
 }
