@@ -8,8 +8,8 @@ import (
 	"github.com/go-gl/glfw/v3.3/glfw"
 )
 
-const windowWidth = 1920
-const windowHeight = 1080
+const windowWidth = 1280
+const windowHeight = 720
 
 var (
 	frames            = 0
@@ -21,7 +21,8 @@ var (
 
 func main() {
 
-	loadMap()
+	//loadMap()
+	makeMap()
 
 	initiateOpenGL()
 	prepareVertices()

@@ -13,9 +13,31 @@ const (
 
 var grid [gridSize][gridSize][gridHeight][2]uint16
 
-func loadMap() {
+func makeMap() {
 
-	f1, err1 := os.Open("maps/default.map")
+	for x := -gridCentre; x < gridCentre; x++ {
+		for z := -gridCentre; z < gridCentre; z++ {
+
+			if x%3 == 0 && z%3 == 0 {
+				grid[x+gridCentre][z+gridCentre][0][0] = 2
+				grid[x+gridCentre][z+gridCentre][0][1] = 3
+				grid[x+gridCentre][z+gridCentre][1][0] = 4
+				grid[x+gridCentre][z+gridCentre][1][1] = 5
+				grid[x+gridCentre][z+gridCentre][2][0] = 6
+				grid[x+gridCentre][z+gridCentre][2][1] = 7
+			} else {
+				grid[x+gridCentre][z+gridCentre][0][0] = 1
+				grid[x+gridCentre][z+gridCentre][0][1] = 0
+			}
+
+		}
+	}
+
+}
+
+func loadMap(filename string) {
+
+	f1, err1 := os.Open(filename)
 	if err1 == nil {
 		decoder1 := gob.NewDecoder(f1)
 		err := decoder1.Decode(&grid)
