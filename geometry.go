@@ -96,70 +96,73 @@ func prepareVertices() {
 
 	vertices = make([]float32, 0)
 
-	for x := -gridCentre; x < gridCentre; x++ {
-		for z := -gridCentre; z < gridCentre; z++ {
-			for y := 0; y < gridHeight; y++ {
+	for x := -MAP_CENTRE; x <= MAP_CENTRE; x++ {
+		for z := -MAP_CENTRE; z <= MAP_CENTRE; z++ {
+			for y := 0; y < MAP_HEIGHT; y++ {
 
 				ambient := []float32{float32(32 / math.Hypot(math.Hypot(float64(x), float64(z)), float64(32-y))),
 					float32(32 / math.Hypot(math.Hypot(float64(x), float64(z)), float64(32-y))),
 					float32(32 / math.Hypot(math.Hypot(float64(x), float64(z)), float64(32-y)))}
 
-				baseTexture := int(grid[x+gridCentre][z+gridCentre][y][0]) - 1
-				sideTexture := int(grid[x+gridCentre][z+gridCentre][y][1]) - 1
+				flatTexture := int(grid[x+MAP_CENTRE][z+MAP_CENTRE].flats[y]) - 1
+				wallTexture := -1
+				if y < MAP_HEIGHT-1 {
+					wallTexture = int(grid[x+MAP_CENTRE][z+MAP_CENTRE].walls[y]) - 1
+				}
 				shadow = []float32{0.5 * ambient[0], 0.5 * ambient[1], 0.5 * ambient[2]}
 
-				if baseTexture == -1 {
-					continue
-				}
+				inShadow := calculateMapShadow(float64(x), float64(y), float64(z), uint16(wallTexture+1))
 
-				inShadow := calculateMapShadow(float64(x), float64(y), float64(z), uint16(sideTexture+1))
+				if flatTexture != -1 {
 
-				if sideTexture == -1 {
-					if y == 0 || y > 0 && grid[x+gridCentre][z+gridCentre][y-1][0] == 0 {
+					/*if wallTexture == -1 {
+						if y == 0 || y > 0 && grid[x+MAP_CENTRE][z+MAP_CENTRE].flats[y-1] == 0 {
+							for i, v := range cubeBottom {
+								processVertex(v, i, x, y, z, inShadow, flatTexture, []float32{1 * ambient[0], 1 * ambient[1], 1 * ambient[2]})
+							}
+						}
+						if y == 0 || y > 0 && grid[x+MAP_CENTRE][z+MAP_CENTRE].flats[y-1] == 0 {
+							for i, v := range cubeFlippedBottom {
+								processVertex(v, i, x, y, z, false, flatTexture, []float32{0.333 * ambient[0], 0.333 * ambient[1], 0.333 * ambient[2]})
+							}
+						}
+					} else {*/
+					if y == MAP_HEIGHT-1 || y < MAP_HEIGHT-2 && grid[x+MAP_CENTRE][z+MAP_CENTRE].flats[y+1] == 0 {
 						for i, v := range cubeBottom {
-							processVertex(v, i, x, y, z, inShadow, baseTexture, []float32{1 * ambient[0], 1 * ambient[1], 1 * ambient[2]})
+							processVertex(v, i, x, y, z, inShadow, flatTexture, []float32{1 * ambient[0], 1 * ambient[1], 1 * ambient[2]})
 						}
 					}
-					if y == 0 || y > 0 && grid[x+gridCentre][z+gridCentre][y-1][0] == 0 {
+					/*if y == 0 || y > 0 && grid[x+MAP_CENTRE][z+MAP_CENTRE].flats[y-1] == 0 {
 						for i, v := range cubeFlippedBottom {
-							processVertex(v, i, x, y, z, false, baseTexture, []float32{0.333 * ambient[0], 0.333 * ambient[1], 0.333 * ambient[2]})
+							processVertex(v, i, x, y, z, false, flatTexture, []float32{0.333 * ambient[0], 0.333 * ambient[1], 0.333 * ambient[2]})
 						}
-					}
-				} else {
-					if y == gridHeight-1 || y < gridHeight-1 && grid[x+gridCentre][z+gridCentre][y+1][0] == 0 {
-						for i, v := range cubeTop {
-							processVertex(v, i, x, y, z, inShadow, baseTexture, []float32{1 * ambient[0], 1 * ambient[1], 1 * ambient[2]})
-						}
-					}
-					if y == 0 || y > 0 && grid[x+gridCentre][z+gridCentre][y-1][0] == 0 {
-						for i, v := range cubeFlippedBottom {
-							processVertex(v, i, x, y, z, false, baseTexture, []float32{0.333 * ambient[0], 0.333 * ambient[1], 0.333 * ambient[2]})
-						}
-					}
+					}*/
+					//}
+
 				}
 
-				if sideTexture == -1 {
+				if wallTexture == -1 {
 					continue
 				}
 
-				if x == -gridCentre || x > -gridCentre && grid[x+gridCentre-1][z+gridCentre][y][1] == 0 {
+				if x == -MAP_CENTRE || x > -MAP_CENTRE && grid[x+MAP_CENTRE-1][z+MAP_CENTRE].walls[y] == 0 {
 					for i, v := range cubeLeft {
-						processVertex(v, i, x, y, z, false, sideTexture, []float32{0.5 * ambient[0], 0.5 * ambient[1], 0.5 * ambient[2]})
+						processVertex(v, i, x, y, z, false, wallTexture, []float32{0.5 * ambient[0], 0.5 * ambient[1], 0.5 * ambient[2]})
 					}
 				}
-				if x == gridCentre-1 || x < gridCentre-1 && grid[x+gridCentre+1][z+gridCentre][y][1] == 0 {
+				if x == MAP_CENTRE || x < MAP_CENTRE && grid[x+MAP_CENTRE+1][z+MAP_CENTRE].walls[y] == 0 {
 					for i, v := range cubeRight {
-						processVertex(v, i, x, y, z, false, sideTexture, []float32{0.5 * ambient[0], 0.5 * ambient[1], 0.5 * ambient[2]})
+						processVertex(v, i, x, y, z, false, wallTexture, []float32{0.5 * ambient[0], 0.5 * ambient[1], 0.5 * ambient[2]})
 					}
 				}
-				if z == -gridCentre || z > -gridCentre && grid[x+gridCentre][z+gridCentre-1][y][1] == 0 {
+				if z == -MAP_CENTRE || z > -MAP_CENTRE && grid[x+MAP_CENTRE][z+MAP_CENTRE-1].walls[y] == 0 {
 					for i, v := range cubeLightSide {
-						processVertex(v, i, x, y, z, inShadow, sideTexture, []float32{0.75 * ambient[0], 0.75 * ambient[1], 0.75 * ambient[2]})
+						processVertex(v, i, x, y, z, inShadow, wallTexture, []float32{0.75 * ambient[0], 0.75 * ambient[1], 0.75 * ambient[2]})
 					}
 				}
-				if z == gridCentre-1 || z < gridCentre-1 && grid[x+gridCentre][z+gridCentre+1][y][1] == 0 {
+				if z == MAP_CENTRE || z < MAP_CENTRE && grid[x+MAP_CENTRE][z+MAP_CENTRE+1].walls[y] == 0 {
 					for i, v := range cubeDarkSide {
-						processVertex(v, i, x, y, z, false, sideTexture, []float32{0.333 * ambient[0], 0.333 * ambient[1], 0.333 * ambient[2]})
+						processVertex(v, i, x, y, z, false, wallTexture, []float32{0.333 * ambient[0], 0.333 * ambient[1], 0.333 * ambient[2]})
 					}
 				}
 
