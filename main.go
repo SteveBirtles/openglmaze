@@ -33,6 +33,7 @@ func main() {
 		frameStart := time.Now()
 
 		processInputs()
+		prepareVertices()
 		renderWorld()
 
 		glfw.PollEvents()
@@ -40,6 +41,7 @@ func main() {
 		select {
 		case <-second:
 			window.SetTitle(fmt.Sprintf("%s | FPS: %d", windowTitlePrefix, frames))
+			fmt.Printf("FPS: %d\n", frames)
 			frames = 0
 		default:
 		}

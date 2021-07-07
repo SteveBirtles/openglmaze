@@ -9,8 +9,8 @@ const (
 	MAP_CENTRE int = 40
 	MAP_HEIGHT int = 4
 
-	DEFAULT_FLAT int = 26
-	DEFAULT_WALL int = 1
+	DEFAULT_FLAT int = 2
+	DEFAULT_WALL int = 2
 
 	CEILING_BIT uint = 0b10000
 	HIGH_BIT    uint = 0b01000
