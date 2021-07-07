@@ -21,8 +21,7 @@ var (
 
 func main() {
 
-	//loadMap()
-	makeMap()
+	makeMaze()
 
 	initiateOpenGL()
 	prepareVertices()
@@ -34,6 +33,8 @@ func main() {
 		frameStart := time.Now()
 
 		processInputs()
+
+		prepareVertices()
 		renderWorld()
 
 		glfw.PollEvents()
