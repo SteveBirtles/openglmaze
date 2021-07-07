@@ -33,8 +33,6 @@ func main() {
 		frameStart := time.Now()
 
 		processInputs()
-
-		prepareVertices()
 		renderWorld()
 
 		glfw.PollEvents()

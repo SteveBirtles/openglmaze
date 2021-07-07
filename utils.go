@@ -53,11 +53,6 @@ func initiateOpenGL() {
 	gl.DepthFunc(gl.LESS)
 	gl.Enable(gl.CULL_FACE)
 	gl.ClearColor(0.0, 0.0, 0.0, 1.0)
-	//gl.Enable(gl.MULTISAMPLE)
-
-	var vao uint32
-	gl.GenVertexArrays(1, &vao)
-	gl.BindVertexArray(vao)
 
 }
 

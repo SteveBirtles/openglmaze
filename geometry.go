@@ -1,8 +1,6 @@
 package main
 
 import (
-	"math"
-
 	gl "github.com/go-gl/gl/v3.1/gles2"
 )
 
@@ -100,6 +98,12 @@ func prepareVertices() {
 		for z := 0; z < MAP_SIZE; z++ {
 			for y := 0; y < MAP_HEIGHT; y++ {
 
+				d := dist(float64(x), float64(z), myX, myZ)
+
+				if d > 10 {
+					continue
+				}
+
 				var flatBit uint
 				var wallBit uint
 				switch y {
@@ -117,11 +121,11 @@ func prepareVertices() {
 					wallBit = CEILING_BIT
 				}
 
-				d := float32(16 / math.Hypot(math.Hypot(myX-float64(x), myY-float64(y)), myZ-float64(z)))
+				//d := float32(16 / math.Hypot(math.Hypot(myX-float64(x), myY-float64(y)), myZ-float64(z)))
 
-				ambient := []float32{d, d, d}
+				//ambient := []float32{d, d, d}
 
-				//ambient := []float32{1, 1, 1}
+				ambient := []float32{1, 1, 1}
 
 				flatTexture := int(grid[x][z].flats[y]) - 1
 				wallTexture := -1
@@ -175,6 +179,10 @@ func prepareVertices() {
 
 		}
 	}
+
+	var vao uint32
+	gl.GenVertexArrays(1, &vao)
+	gl.BindVertexArray(vao)
 
 	var vbo uint32
 	gl.GenBuffers(1, &vbo)
