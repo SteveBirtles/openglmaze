@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"math"
 
 	gl "github.com/go-gl/gl/v3.1/gles2"
@@ -20,11 +19,9 @@ func renderWorld() {
 	cameraUniform := gl.GetUniformLocation(shaderProgram, gl.Str("camera\x00"))
 	gl.UniformMatrix4fv(cameraUniform, 1, false, &camera[0])
 
-	for i := 0; i < 40; i++ {
+	for i := 0; i < textureCount; i++ {
 
 		if len(vertices[i]) > 0 {
-
-			fmt.Printf("%v\t", i)
 
 			gl.BufferData(gl.ARRAY_BUFFER, len(vertices[i])*4, gl.Ptr(vertices[i]), gl.STATIC_DRAW)
 

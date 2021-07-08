@@ -8,7 +8,7 @@ const texZero = 0.0
 const texOne = 1.0
 
 var (
-	vertices [40][]float32
+	vertices [textureCount][]float32
 
 	cubeBottom = []float32{ //blue
 		0.5, -0.5, -0.5, texOne, texZero,
@@ -82,7 +82,7 @@ func prepareVertices() {
 
 	const drawDistance float64 = 20
 
-	for i := 0; i < 40; i++ {
+	for i := 0; i < textureCount; i++ {
 		vertices[i] = make([]float32, 0)
 	}
 

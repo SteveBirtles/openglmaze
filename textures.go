@@ -5,17 +5,20 @@ import (
 	"image"
 	"image/draw"
 	"log"
+	"math"
 	"os"
 
 	gl "github.com/go-gl/gl/v3.1/gles2"
 )
 
-var texture [40]uint32
+const textureCount = 40
+
+var texture [textureCount]uint32
 
 func prepareTextures() {
 
 	var err error
-	for i := 0; i < 40; i++ {
+	for i := 0; i < textureCount; i++ {
 		texture[i], err = newTexture(fmt.Sprintf("textures/%v.png", i+1))
 		if err != nil {
 			log.Fatalln(err)
@@ -48,7 +51,7 @@ func newTexture(file string) (uint32, error) {
 	gl.GenTextures(1, &texID)
 	gl.ActiveTexture(gl.TEXTURE0)
 	gl.BindTexture(gl.TEXTURE_2D, texID)
-	gl.TexStorage2D(gl.TEXTURE_2D, 12, gl.RGBA8, width, height)
+	gl.TexStorage2D(gl.TEXTURE_2D, int32(math.Log2(math.Min(float64(width), float64(height)))), gl.RGBA8, width, height)
 	gl.TexSubImage2D(gl.TEXTURE_2D, 0, 0, 0, width, height, gl.BGRA_EXT, gl.UNSIGNED_BYTE, gl.Ptr(rgba.Pix))
 	gl.GenerateMipmap(gl.TEXTURE_2D)
 	gl.TexParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR_MIPMAP_LINEAR)
