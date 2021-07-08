@@ -39,7 +39,7 @@ const (
 type mapCell struct {
 	cellType uint
 	flats    [4]int
-	walls    [3]int
+	walls    [3][4]int
 }
 
 type kruskalCell struct {
@@ -58,7 +58,7 @@ func clearMap() {
 			grid[x+MAP_CENTRE][z+MAP_CENTRE] = mapCell{
 				0b0,
 				[4]int{0, 0, 0, 0},
-				[3]int{0, 0, 0},
+				[3][4]int{{0, 0, 0, 0}, {0, 0, 0, 0}, {0, 0, 0, 0}},
 			}
 		}
 	}
@@ -157,11 +157,13 @@ func makeMaze() {
 				grid[i+MAP_CENTRE][j+MAP_CENTRE].cellType = GENERATOR_WALL
 			}
 			for f := 0; f < 4; f++ {
-				grid[i+MAP_CENTRE][j+MAP_CENTRE].flats[f] = DEFAULT_FLAT
+				grid[i+MAP_CENTRE][j+MAP_CENTRE].flats[f] = rand.Intn(textureCount) + 1 //DEFAULT_FLAT
 				if f == 3 {
 					break
 				}
-				grid[i+MAP_CENTRE][j+MAP_CENTRE].walls[f] = DEFAULT_WALL
+				for d := 0; d < 4; d++ {
+					grid[i+MAP_CENTRE][j+MAP_CENTRE].walls[f][d] = rand.Intn(textureCount) + 1 //DEFAULT_WALL
+				}
 			}
 		}
 	}
@@ -171,21 +173,25 @@ func makeMaze() {
 			if kruskalMaze[i][j].right {
 				grid[i*2+2][j*2+1].cellType = GENERATOR_PATH
 				for f := 0; f < 4; f++ {
-					grid[i*2+2][j*2+1].flats[f] = DEFAULT_FLAT
+					grid[i*2+2][j*2+1].flats[f] = rand.Intn(textureCount) + 1 //DEFAULT_FLAT
 					if f == 3 {
 						break
 					}
-					grid[i*2+2][j*2+1].walls[f] = DEFAULT_WALL
+					for d := 0; d < 4; d++ {
+						grid[i*2+2][j*2+1].walls[f][d] = rand.Intn(textureCount) + 1 //DEFAULT_WALL
+					}
 				}
 			}
 			if kruskalMaze[i][j].down {
 				grid[i*2+1][j*2+2].cellType = GENERATOR_PATH
 				for f := 0; f < 4; f++ {
-					grid[i*2+1][j*2+2].flats[f] = DEFAULT_FLAT
+					grid[i*2+1][j*2+2].flats[f] = rand.Intn(textureCount) + 1 //DEFAULT_FLAT
 					if f == 3 {
 						break
 					}
-					grid[i*2+1][j*2+2].walls[f] = DEFAULT_WALL
+					for d := 0; d < 4; d++ {
+						grid[i*2+1][j*2+2].walls[f][d] = rand.Intn(textureCount) + 1 //DEFAULT_WALL
+					}
 				}
 			}
 		}
@@ -195,41 +201,23 @@ func makeMaze() {
 		rw := rand.Intn(10) + 5
 		rh := rand.Intn(10) + 5
 		x := rand.Intn(MAP_CENTRE*2 - rw)
-		y := rand.Intn(MAP_CENTRE*2 - rh)
-		/*if r == 0 {
-			playerX = (x + rw/2 - MAP_CENTRE) * unit
-			playerY = (y + rh/2 - MAP_CENTRE) * unit
-		}*/
+		z := rand.Intn(MAP_CENTRE*2 - rh)
+		if r == 0 {
+			myX = float64(x+rw/2) * unit
+			myZ = float64(z+rh/2) * unit
+		}
 		for i := x; i <= x+rw; i++ {
-			for j := y; j <= y+rh; j++ {
+			for j := z; j <= z+rh; j++ {
 				grid[i][j].cellType = GENERATOR_ROOM
 				for f := 0; f < 4; f++ {
-					grid[i][j].flats[f] = DEFAULT_FLAT
+					grid[i][j].flats[f] = rand.Intn(textureCount) + 1 //DEFAULT_FLAT
 				}
 				for f := 0; f < 3; f++ {
-					grid[i][j].walls[f] = DEFAULT_WALL
+					for d := 0; d < 4; d++ {
+						grid[i][j].walls[f][d] = rand.Intn(textureCount) + 1 //DEFAULT_WALL
+					}
 				}
 			}
 		}
 	}
-}
-
-func calculateMapShadow(x float64, y float64, z float64, frontTile uint16) bool {
-
-	/*for s := 1.0; y+s < MAP_HEIGHT; s++ {
-
-		if int(z-s) >= -MAP_CENTRE && int(z-s) < MAP_CENTRE {
-
-			if frontTile == 0 &&
-				(grid[int(x)+MAP_CENTRE][int(z-s)+MAP_CENTRE][int(y+s-1)][1] > 0 || grid[int(x)+MAP_CENTRE][int(z-s)+MAP_CENTRE][int(y+s)][0] > 0) ||
-				frontTile > 0 && s > 1 &&
-					(grid[int(x)+MAP_CENTRE][int(z-s)+MAP_CENTRE][int(y+s)][0] > 0 || grid[int(x)+MAP_CENTRE][int(z-s+1)+MAP_CENTRE][int(y+s)][0] > 0) {
-				return true
-			}
-
-		}
-	}*/
-
-	return false
-
 }

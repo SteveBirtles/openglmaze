@@ -73,20 +73,19 @@ func processInputs() {
 	if potentialZ < 0 {
 		potentialZ = 0
 	}
-	if potentialX > float64(MAP_SIZE) {
-		potentialX = float64(MAP_SIZE)
+	if potentialX > float64(MAP_SIZE)-1 {
+		potentialX = float64(MAP_SIZE) - 1
 	}
-	if potentialZ > float64(MAP_SIZE) {
-		potentialZ = float64(MAP_SIZE)
+	if potentialZ > float64(MAP_SIZE)-1 {
+		potentialZ = float64(MAP_SIZE) - 1
 	}
-
 
 	distanceTravelled := dist(potentialX, potentialZ, myX, myZ)
-	if distanceTravelled > unit/3 {
+	if distanceTravelled > unit/2 {
 		dx := (potentialX - myX) / distanceTravelled
 		dz := (potentialZ - myZ) / distanceTravelled
-		potentialX = myX + dx*(unit/3)
-		potentialZ = myZ + dz*(unit/3)
+		potentialX = myX + dx*(unit/2)
+		potentialZ = myZ + dz*(unit/2)
 	}
 
 	mouseX, mouseY := window.GetCursorPos()
@@ -108,7 +107,6 @@ func processInputs() {
 	if pitch < -0.5*math.Pi+0.001 {
 		pitch = -0.5*math.Pi + 0.001
 	}
-
 
 	mapXstart := int(math.Floor(myX / unit))
 	mapZstart := int(math.Floor(myZ / unit))
