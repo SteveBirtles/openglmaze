@@ -8,9 +8,9 @@ import (
 	"github.com/go-gl/glfw/v3.3/glfw"
 )
 
-const windowWidth = 1920  //1280
-const windowHeight = 1080 //720
-const fullScreen = true
+const windowWidth = 1280
+const windowHeight = 720
+const fullScreen = false
 
 var (
 	frames            = 0

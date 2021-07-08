@@ -80,7 +80,7 @@ func processVertex(v float32, index int, coords []int, texture int, rgb []float3
 
 func prepareVertices() {
 
-	const drawDistance float64 = 20
+	const drawDistance float64 = 12
 
 	for i := 0; i < textureCount; i++ {
 		vertices[i] = make([]float32, 0)
@@ -89,7 +89,7 @@ func prepareVertices() {
 	for x := int(math.Floor(myX) - drawDistance); x < int(math.Floor(myX)+drawDistance); x++ {
 		for z := int(math.Floor(myZ) - drawDistance); z < int(math.Floor(myZ)+drawDistance); z++ {
 
-			if x < 0 || z < 0 || x >= MAP_SIZE || z >= MAP_SIZE {
+			if x < 0 || z < 0 || x > MAP_SIZE || z > MAP_SIZE {
 				continue
 			}
 
@@ -148,7 +148,7 @@ func prepareVertices() {
 						processVertex(v, i, coords, wallTexture, ambient) //[]float32{ambient[0], 0.0, 0.0})
 					}
 				}
-				if x == MAP_SIZE-2 || x < MAP_SIZE-1 && grid[x+1][z].cellType&wallBit == 0 {
+				if x == MAP_SIZE-1 || x < MAP_SIZE-1 && grid[x+1][z].cellType&wallBit == 0 {
 					for i, v := range cubeRight {
 						processVertex(v, i, coords, wallTexture, ambient) //[]float32{ambient[0], ambient[1], 0.0})
 					}
@@ -158,7 +158,7 @@ func prepareVertices() {
 						processVertex(v, i, coords, wallTexture, ambient) //[]float32{0.0, ambient[1], 0.0})
 					}
 				}
-				if z == MAP_SIZE-2 || z < MAP_SIZE-1 && grid[x][z+1].cellType&wallBit == 0 {
+				if z == MAP_SIZE-1 || z < MAP_SIZE-1 && grid[x][z+1].cellType&wallBit == 0 {
 					for i, v := range cubeDarkSide {
 						processVertex(v, i, coords, wallTexture, ambient) //[]float32{0.0, ambient[1], ambient[2]})
 					}

@@ -157,11 +157,11 @@ func makeMaze() {
 				grid[i+MAP_CENTRE][j+MAP_CENTRE].cellType = GENERATOR_WALL
 			}
 			for f := 0; f < 4; f++ {
-				grid[i+MAP_CENTRE][j+MAP_CENTRE].flats[f] = rand.Intn(textureCount) //DEFAULT_FLAT
+				grid[i+MAP_CENTRE][j+MAP_CENTRE].flats[f] = DEFAULT_FLAT
 				if f == 3 {
 					break
 				}
-				grid[i+MAP_CENTRE][j+MAP_CENTRE].walls[f] = rand.Intn(textureCount) //DEFAULT_WALL
+				grid[i+MAP_CENTRE][j+MAP_CENTRE].walls[f] = DEFAULT_WALL
 			}
 		}
 	}
@@ -171,21 +171,21 @@ func makeMaze() {
 			if kruskalMaze[i][j].right {
 				grid[i*2+2][j*2+1].cellType = GENERATOR_PATH
 				for f := 0; f < 4; f++ {
-					grid[i*2+2][j*2+1].flats[f] = rand.Intn(textureCount) //DEFAULT_FLAT
+					grid[i*2+2][j*2+1].flats[f] = DEFAULT_FLAT
 					if f == 3 {
 						break
 					}
-					grid[i*2+2][j*2+1].walls[f] = rand.Intn(textureCount) //DEFAULT_WALL
+					grid[i*2+2][j*2+1].walls[f] = DEFAULT_WALL
 				}
 			}
 			if kruskalMaze[i][j].down {
 				grid[i*2+1][j*2+2].cellType = GENERATOR_PATH
 				for f := 0; f < 4; f++ {
-					grid[i*2+1][j*2+2].flats[f] = rand.Intn(textureCount) //DEFAULT_FLAT
+					grid[i*2+1][j*2+2].flats[f] = DEFAULT_FLAT
 					if f == 3 {
 						break
 					}
-					grid[i*2+1][j*2+2].walls[f] = rand.Intn(textureCount) //DEFAULT_WALL
+					grid[i*2+1][j*2+2].walls[f] = DEFAULT_WALL
 				}
 			}
 		}
@@ -204,10 +204,10 @@ func makeMaze() {
 			for j := y; j <= y+rh; j++ {
 				grid[i][j].cellType = GENERATOR_ROOM
 				for f := 0; f < 4; f++ {
-					grid[i][j].flats[f] = rand.Intn(textureCount) //DEFAULT_FLAT
+					grid[i][j].flats[f] = DEFAULT_FLAT
 				}
 				for f := 0; f < 3; f++ {
-					grid[i][j].walls[f] = rand.Intn(textureCount) //DEFAULT_WALL
+					grid[i][j].walls[f] = DEFAULT_WALL
 				}
 			}
 		}

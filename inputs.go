@@ -10,8 +10,6 @@ var (
 	myX     float64 = float64(MAP_CENTRE)
 	myY     float64 = 0
 	myZ     float64 = float64(MAP_CENTRE)
-	lastX   float64 = myX
-	lastZ   float64 = myZ
 	pitch   float64 = 0
 	bearing float64 = 0
 	unit            = 1.0
@@ -23,55 +21,73 @@ func dist(x0, y0, x1, y1 float64) float64 {
 
 func processInputs() {
 
+	potentialX := myX
+	potentialZ := myZ
+
 	if window.GetKey(glfw.KeyEscape) == glfw.Press {
 		window.SetShouldClose(true)
 	}
 
 	if window.GetKey(glfw.KeyW) == glfw.Press {
-		myX += 10 * frameLength * math.Cos(bearing) //* math.Cos(pitch)
+		potentialX += 10 * frameLength * math.Cos(bearing) //* math.Cos(pitch)
 		//myY += 10 * frameLength * math.Sin(pitch)
-		myZ += 10 * frameLength * math.Sin(bearing) //* math.Cos(pitch)
+		potentialZ += 10 * frameLength * math.Sin(bearing) //* math.Cos(pitch)
 	}
 
 	if window.GetKey(glfw.KeyS) == glfw.Press {
-		myX -= 10 * frameLength * math.Cos(bearing) //* math.Cos(pitch)
+		potentialX -= 10 * frameLength * math.Cos(bearing) //* math.Cos(pitch)
 		//myY -= 10 * frameLength * math.Sin(pitch)
-		myZ -= 10 * frameLength * math.Sin(bearing) //* math.Cos(pitch)
+		potentialZ -= 10 * frameLength * math.Sin(bearing) //* math.Cos(pitch)
 	}
 
 	if window.GetKey(glfw.KeyA) == glfw.Press {
-		myX += 10 * frameLength * math.Sin(bearing)
-		myZ -= 10 * frameLength * math.Cos(bearing)
+		potentialX += 10 * frameLength * math.Sin(bearing)
+		potentialZ -= 10 * frameLength * math.Cos(bearing)
 	}
 
 	if window.GetKey(glfw.KeyD) == glfw.Press {
-		myX -= 10 * frameLength * math.Sin(bearing)
-		myZ += 10 * frameLength * math.Cos(bearing)
+		potentialX -= 10 * frameLength * math.Sin(bearing)
+		potentialZ += 10 * frameLength * math.Cos(bearing)
 	}
 
 	if window.GetKey(glfw.KeyLeftControl) == glfw.Press {
-		//myX += 10 * frameLength * math.Cos(bearing) * math.Sin(pitch)
+		//potentialX += 10 * frameLength * math.Cos(bearing) * math.Sin(pitch)
 		myY -= 10 * frameLength //* math.Cos(pitch)
-		//myZ += 10 * frameLength * math.Sin(bearing) * math.Sin(pitch)
+		//potentialZ += 10 * frameLength * math.Sin(bearing) * math.Sin(pitch)
 
 	}
 
 	if window.GetKey(glfw.KeySpace) == glfw.Press {
-		//myX -= 10 * frameLength * math.Cos(bearing) * math.Sin(pitch)
+		//potentialX -= 10 * frameLength * math.Cos(bearing) * math.Sin(pitch)
 		myY += 10 * frameLength //* math.Cos(pitch)
-		//myZ -= 10 * frameLength * math.Sin(bearing) * math.Sin(pitch)
+		//potentialZ -= 10 * frameLength * math.Sin(bearing) * math.Sin(pitch)
 	}
 
-	distanceTravelled := dist(myX, myZ, lastX, lastZ)
-	if distanceTravelled > unit/2 {
-		dx := (myX - lastX) / distanceTravelled
-		dy := (myZ - lastZ) / distanceTravelled
-		myX = lastX + dx*(unit/2)
-		myZ = lastZ + dy*(unit/2)
+	if myY < 0 {
+		myY = 0
 	}
 
-	lastX = myX
-	lastZ = myZ
+	if potentialX < 0 {
+		potentialX = 0
+	}
+	if potentialZ < 0 {
+		potentialZ = 0
+	}
+	if potentialX > float64(MAP_SIZE) {
+		potentialX = float64(MAP_SIZE)
+	}
+	if potentialZ > float64(MAP_SIZE) {
+		potentialZ = float64(MAP_SIZE)
+	}
+
+
+	distanceTravelled := dist(potentialX, potentialZ, myX, myZ)
+	if distanceTravelled > unit/3 {
+		dx := (potentialX - myX) / distanceTravelled
+		dz := (potentialZ - myZ) / distanceTravelled
+		potentialX = myX + dx*(unit/3)
+		potentialZ = myZ + dz*(unit/3)
+	}
 
 	mouseX, mouseY := window.GetCursorPos()
 
@@ -93,38 +109,20 @@ func processInputs() {
 		pitch = -0.5*math.Pi + 0.001
 	}
 
-	if myY < 0 {
-		myY = 0
-	}
 
-	if myX < 0 {
-		myX = 0
-	}
-	if myZ < 0 {
-		myZ = 0
-	}
-	if myX > float64(MAP_SIZE) {
-		myX = float64(MAP_SIZE)
-	}
-	if myZ > float64(MAP_SIZE) {
-		myZ = float64(MAP_SIZE)
-	}
+	mapXstart := int(math.Floor(myX / unit))
+	mapZstart := int(math.Floor(myZ / unit))
 
-	mapXstart := int(math.Floor(lastX / unit))
-	mapZstart := int(math.Floor(lastZ / unit))
-
-	mapXtarget := int(math.Floor(myX / unit))
-	mapZtarget := int(math.Floor(myZ / unit))
+	mapXtarget := int(math.Floor(potentialX / unit))
+	mapZtarget := int(math.Floor(potentialZ / unit))
 
 	lowestX := int(math.Floor(math.Min(float64(mapXstart), float64(mapXtarget))) - 1)
 	highestX := int(math.Floor(math.Max(float64(mapXstart), float64(mapXtarget))) + 1)
 	lowestZ := int(math.Floor(math.Min(float64(mapZstart), float64(mapZtarget))) - 1)
 	highestZ := int(math.Floor(math.Max(float64(mapZstart), float64(mapZtarget))) + 1)
 
-	mapY := math.Floor(myY)
-
 	interactionBit := uint(0)
-	switch mapY {
+	switch math.Floor(myY) {
 	case 0:
 		interactionBit = WALL_BIT
 	case 1:
@@ -145,11 +143,11 @@ func processInputs() {
 
 					if grid[i][j].cellType&interactionBit > 0 {
 
-						nearestPointX := math.Max(float64(i)*unit, math.Min(myX, float64((i)+1)*unit))
-						nearestPointZ := math.Max(float64(j)*unit, math.Min(myZ, float64((j)+1)*unit))
+						nearestPointX := math.Max(float64(i)*unit, math.Min(potentialX, float64(i+1)*unit))
+						nearestPointZ := math.Max(float64(j)*unit, math.Min(potentialZ, float64(j+1)*unit))
 
-						rayX := nearestPointX - myX
-						rayZ := nearestPointZ - myZ
+						rayX := nearestPointX - potentialX
+						rayZ := nearestPointZ - potentialZ
 
 						rayLength := dist(0, 0, rayX, rayZ)
 						if rayLength == 0 {
@@ -160,8 +158,8 @@ func processInputs() {
 
 						if rayOverlap > 0 {
 
-							myX -= rayOverlap * rayX / rayLength
-							myZ -= rayOverlap * rayZ / rayLength
+							potentialX -= rayOverlap * rayX / rayLength
+							potentialZ -= rayOverlap * rayZ / rayLength
 
 						}
 
@@ -173,4 +171,8 @@ func processInputs() {
 		}
 
 	}
+
+	myX = potentialX
+	myZ = potentialZ
+
 }
