@@ -36,8 +36,11 @@ func initiateOpenGL() {
 	//glfw.WindowHint(glfw.OpenGLForwardCompatible, glfw.True)
 	glfw.WindowHint(glfw.Samples, 4)
 
-	/* Set first nil to  glfw.GetPrimaryMonitor() for full screen */
-	window, err = glfw.CreateWindow(windowWidth, windowHeight, windowTitlePrefix, nil, nil)
+	if fullScreen {
+		window, err = glfw.CreateWindow(windowWidth, windowHeight, windowTitlePrefix, glfw.GetPrimaryMonitor(), nil)
+	} else {
+		window, err = glfw.CreateWindow(windowWidth, windowHeight, windowTitlePrefix, nil, nil)
+	}
 	if err != nil {
 		panic(err)
 	}

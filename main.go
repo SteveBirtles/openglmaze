@@ -8,8 +8,9 @@ import (
 	"github.com/go-gl/glfw/v3.3/glfw"
 )
 
-const windowWidth = 1280
-const windowHeight = 720
+const windowWidth = 1920  //1280
+const windowHeight = 1080 //720
+const fullScreen = true
 
 var (
 	frames            = 0
@@ -24,7 +25,6 @@ func main() {
 	makeMaze()
 
 	initiateOpenGL()
-	prepareVertices()
 	prepareTextures()
 	prepareShaders()
 

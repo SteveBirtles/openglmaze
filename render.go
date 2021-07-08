@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"math"
 
 	gl "github.com/go-gl/gl/v3.1/gles2"
@@ -19,9 +20,21 @@ func renderWorld() {
 	cameraUniform := gl.GetUniformLocation(shaderProgram, gl.Str("camera\x00"))
 	gl.UniformMatrix4fv(cameraUniform, 1, false, &camera[0])
 
-	gl.ActiveTexture(gl.TEXTURE0)
-	gl.BindTexture(gl.TEXTURE_2D, texture)
-	gl.DrawArrays(gl.TRIANGLES, 0, int32(len(vertices)))
+	for i := 0; i < 40; i++ {
+
+		if len(vertices[i]) > 0 {
+
+			fmt.Printf("%v\t", i)
+
+			gl.BufferData(gl.ARRAY_BUFFER, len(vertices[i])*4, gl.Ptr(vertices[i]), gl.STATIC_DRAW)
+
+			gl.ActiveTexture(gl.TEXTURE0)
+			gl.BindTexture(gl.TEXTURE_2D, texture[i])
+			gl.DrawArrays(gl.TRIANGLES, 0, int32(len(vertices[i])))
+
+		}
+
+	}
 
 	window.SwapBuffers()
 

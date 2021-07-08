@@ -10,14 +10,16 @@ import (
 	gl "github.com/go-gl/gl/v3.1/gles2"
 )
 
-var texture uint32
+var texture [40]uint32
 
 func prepareTextures() {
 
 	var err error
-	texture, err = newTexture("textures/textures.png")
-	if err != nil {
-		log.Fatalln(err)
+	for i := 0; i < 40; i++ {
+		texture[i], err = newTexture(fmt.Sprintf("textures/%v.png", i+1))
+		if err != nil {
+			log.Fatalln(err)
+		}
 	}
 
 }
@@ -42,17 +44,17 @@ func newTexture(file string) (uint32, error) {
 	width := int32(rgba.Rect.Size().X)
 	height := int32(rgba.Rect.Size().Y)
 
-	var texture uint32
-	gl.GenTextures(1, &texture)
+	var texID uint32
+	gl.GenTextures(1, &texID)
 	gl.ActiveTexture(gl.TEXTURE0)
-	gl.BindTexture(gl.TEXTURE_2D, texture)
+	gl.BindTexture(gl.TEXTURE_2D, texID)
 	gl.TexStorage2D(gl.TEXTURE_2D, 12, gl.RGBA8, width, height)
 	gl.TexSubImage2D(gl.TEXTURE_2D, 0, 0, 0, width, height, gl.BGRA_EXT, gl.UNSIGNED_BYTE, gl.Ptr(rgba.Pix))
 	gl.GenerateMipmap(gl.TEXTURE_2D)
 	gl.TexParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR_MIPMAP_LINEAR)
 	gl.TexParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR)
-	gl.TexParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.REPEAT)
-	gl.TexParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.REPEAT)
+	gl.TexParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE)
+	gl.TexParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE)
 
 	gl.TexImage2D(
 		gl.TEXTURE_2D,
@@ -65,6 +67,6 @@ func newTexture(file string) (uint32, error) {
 		gl.UNSIGNED_BYTE,
 		gl.Ptr(rgba.Pix))
 
-	return texture, nil
+	return texID, nil
 
 }
