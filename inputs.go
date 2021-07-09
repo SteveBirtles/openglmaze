@@ -8,7 +8,7 @@ import (
 
 var (
 	myX     float64 = float64(MAP_CENTRE)
-	myY     float64 = 0
+	myY     float64 = 0.5
 	myZ     float64 = float64(MAP_CENTRE)
 	pitch   float64 = 0
 	bearing float64 = 0
@@ -63,8 +63,8 @@ func processInputs() {
 		//potentialZ -= 10 * frameLength * math.Sin(bearing) * math.Sin(pitch)
 	}
 
-	if myY < 0 {
-		myY = 0
+	if myY < 0.5 {
+		myY = 0.5
 	}
 
 	if potentialX < 0 {
