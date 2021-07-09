@@ -7,12 +7,15 @@ import (
 )
 
 var (
-	myX     float64 = float64(MAP_CENTRE)
-	myY     float64 = 0.5
-	myZ     float64 = float64(MAP_CENTRE)
-	pitch   float64 = 0
-	bearing float64 = 0
-	unit            = 1.0
+	myX              float64 = float64(MAP_CENTRE)
+	myY              float64 = 0.5
+	myZ              float64 = float64(MAP_CENTRE)
+	pitch            float64 = 0
+	bearing          float64 = 0
+	unit                     = 1.0
+	selectedTexture          = 5
+	lastLeftBracket  bool
+	lastRightBracket bool
 )
 
 func dist(x0, y0, x1, y1 float64) float64 {
@@ -50,17 +53,52 @@ func processInputs() {
 		potentialZ += 10 * frameLength * math.Cos(bearing)
 	}
 
-	if window.GetKey(glfw.KeyLeftControl) == glfw.Press {
+	if window.GetKey(glfw.KeyF) == glfw.Press {
 		//potentialX += 10 * frameLength * math.Cos(bearing) * math.Sin(pitch)
 		myY -= 10 * frameLength //* math.Cos(pitch)
 		//potentialZ += 10 * frameLength * math.Sin(bearing) * math.Sin(pitch)
 
 	}
 
-	if window.GetKey(glfw.KeySpace) == glfw.Press {
+	if window.GetKey(glfw.KeyR) == glfw.Press {
 		//potentialX -= 10 * frameLength * math.Cos(bearing) * math.Sin(pitch)
 		myY += 10 * frameLength //* math.Cos(pitch)
 		//potentialZ -= 10 * frameLength * math.Sin(bearing) * math.Sin(pitch)
+	}
+
+	if window.GetKey(glfw.KeySpace) == glfw.Press {
+		if cursorX >= 0 && cursorY >= 0 && cursorZ >= 0 &&
+			cursorX < MAP_SIZE && cursorY < MAP_HEIGHT && cursorZ < MAP_SIZE {
+			if cursorWall == -1 {
+				grid[cursorX][cursorZ].flats[cursorY] = selectedTexture
+			} else if cursorWall >= 0 && cursorWall < 4 {
+				grid[cursorX][cursorZ].walls[cursorY][cursorWall] = selectedTexture
+			}
+		}
+	}
+
+	if window.GetKey(glfw.KeyQ) == glfw.Press {
+		if cursorTexture >= 0 && cursorTexture < textureCount {
+			selectedTexture = cursorTexture
+		}
+	}
+
+	if window.GetKey(glfw.KeyLeftBracket) == glfw.Press {
+		if !lastLeftBracket {
+			selectedTexture = (selectedTexture + 1) % textureCount
+			lastLeftBracket = true
+		}
+	} else {
+		lastLeftBracket = false
+	}
+
+	if window.GetKey(glfw.KeyRightBracket) == glfw.Press {
+		if !lastRightBracket {
+			selectedTexture = (selectedTexture + textureCount - 1) % textureCount
+			lastRightBracket = true
+		}
+	} else {
+		lastRightBracket = false
 	}
 
 	if myY < 0.5 {

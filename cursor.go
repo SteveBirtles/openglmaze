@@ -141,6 +141,8 @@ func evaluateCursor() (int, int, int, int, int) {
 				cursorTexture = grid[gridX][gridZ].walls[gridY][cursorWall]
 			} else if gridY >= 0 && gridY <= 3 {
 				cursorTexture = grid[gridX][gridZ].flats[gridY]
+			} else if gridY < 0 {
+				cursorTexture = grid[gridX][gridZ].flats[0]
 			}
 
 			return cursorX, cursorY, cursorZ, cursorWall, cursorTexture

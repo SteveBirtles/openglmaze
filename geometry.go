@@ -68,6 +68,10 @@ var (
 
 func processVertex(v float32, index int, coords []int, texture int, rgb []float32, selected bool) {
 
+	if selected && selectedTexture > 0 && selectedTexture <= textureCount {
+		texture = selectedTexture - 1
+	}
+
 	if index%5 < 3 {
 		v += float32(coords[index%5])
 	}

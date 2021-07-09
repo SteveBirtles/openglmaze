@@ -48,7 +48,7 @@ func main() {
 		select {
 		case <-second:
 			window.SetTitle(fmt.Sprintf("%s | FPS: %d", windowTitlePrefix, frames))
-			fmt.Printf("FPS: %d\tPlayer x: %v, y: %v, z: %v\n", frames, myX, myY, myZ)
+			//fmt.Printf("FPS: %d\tPlayer x: %v, y: %v, z: %v\n", frames, myX, myY, myZ)
 			frames = 0
 		default:
 		}
