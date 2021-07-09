@@ -115,9 +115,13 @@ func prepareVertices() {
 				}
 
 				d := dist(float64(x), float64(z), myX, myZ)
-				illumination := float32(math.Min(0.6667, 1-d/drawDistance))
+				illumination := float32(math.Min(0.5, 1-d/drawDistance))
 
 				ambient := []float32{illumination, illumination, illumination}
+
+				if cursorX == x && cursorY == y && cursorZ == z {
+					ambient = []float32{1, 1, 1}
+				}
 
 				flatTexture := int(grid[x][z].flats[y]) - 1
 
