@@ -95,57 +95,66 @@ func evaluateCursor() (int, int, int, int, int) {
 		gridY := int(math.Floor(stepY + dy*0.001))
 		gridZ := int(math.Floor(stepZ + dz*0.001))
 
-		INTERACTION_BIT := uint(0)
-		if gridY < 0 {
-			INTERACTION_BIT = GROUND_BIT
-		} else if gridY == 0 {
-			INTERACTION_BIT = WALL_BIT
-		} else if gridY == 1 {
-			INTERACTION_BIT = LOW_BIT
-		} else if gridY == 2 {
-			INTERACTION_BIT = HIGH_BIT
-		} else {
-			INTERACTION_BIT = CEILING_BIT
-		}
+		if gridX >= 0 && gridZ >= 0 &&
+			gridX < MAP_SIZE && gridZ < MAP_SIZE {
 
-		if grid[gridX][gridZ].cellType&INTERACTION_BIT > 0 {
-			cursorX = gridX
-			cursorY = gridY
-			cursorZ = gridZ
-
-			if cursorY < 0 {
-				cursorY = 0
+			INTERACTION_BIT := uint(0)
+			if gridY < 0 {
+				INTERACTION_BIT = GROUND_BIT
+			} else if gridY == 0 {
+				INTERACTION_BIT = WALL_BIT
+			} else if gridY == 1 {
+				INTERACTION_BIT = LOW_BIT
+			} else if gridY == 2 {
+				INTERACTION_BIT = HIGH_BIT
+			} else {
+				INTERACTION_BIT = CEILING_BIT
 			}
 
-			_, fractX := math.Modf(stepX)
-			_, fractY := math.Modf(stepY)
-			_, fractZ := math.Modf(stepZ)
+			if grid[gridX][gridZ].cellType&INTERACTION_BIT > 0 {
+				cursorX = gridX
+				cursorY = gridY
+				cursorZ = gridZ
 
-			if fractY != 0 {
-				if fractX == 0 {
-					if dx > 0 {
-						cursorWall = 0
-					} else if dx < 0 {
-						cursorWall = 1
-					}
-				} else if fractZ == 0 {
-					if dz > 0 {
-						cursorWall = 2
-					} else if dz < 0 {
-						cursorWall = 3
+				if cursorY < 0 {
+					cursorY = 0
+				}
+
+				_, fractX := math.Modf(stepX)
+				_, fractY := math.Modf(stepY)
+				_, fractZ := math.Modf(stepZ)
+
+				if fractY != 0 {
+					if fractX == 0 {
+						if dx > 0 {
+							cursorWall = 0
+						} else if dx < 0 {
+							cursorWall = 1
+						}
+					} else if fractZ == 0 {
+						if dz > 0 {
+							cursorWall = 2
+						} else if dz < 0 {
+							cursorWall = 3
+						}
 					}
 				}
+
+				if cursorWall != -1 && gridY >= 0 && gridY <= 2 {
+					cursorTexture = grid[gridX][gridZ].walls[gridY][cursorWall]
+				} else if gridY >= 0 && gridY <= 3 {
+					cursorTexture = grid[gridX][gridZ].flats[gridY]
+				} else if gridY < 0 {
+					cursorTexture = grid[gridX][gridZ].flats[0]
+				}
+
+				return cursorX, cursorY, cursorZ, cursorWall, cursorTexture
+
 			}
 
-			if cursorWall != -1 && gridY >= 0 && gridY <= 2 {
-				cursorTexture = grid[gridX][gridZ].walls[gridY][cursorWall]
-			} else if gridY >= 0 && gridY <= 3 {
-				cursorTexture = grid[gridX][gridZ].flats[gridY]
-			} else if gridY < 0 {
-				cursorTexture = grid[gridX][gridZ].flats[0]
-			}
+		} else {
 
-			return cursorX, cursorY, cursorZ, cursorWall, cursorTexture
+			break
 
 		}
 

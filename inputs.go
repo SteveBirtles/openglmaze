@@ -7,15 +7,15 @@ import (
 )
 
 var (
-	myX              float64 = float64(MAP_CENTRE)
-	myY              float64 = 0.5
-	myZ              float64 = float64(MAP_CENTRE)
-	pitch            float64 = 0
-	bearing          float64 = 0
-	unit                     = 1.0
-	selectedTexture          = 5
-	lastLeftBracket  bool
-	lastRightBracket bool
+	myX             float64 = float64(MAP_CENTRE)
+	myY             float64 = 0.5
+	myZ             float64 = float64(MAP_CENTRE)
+	pitch           float64 = 0
+	bearing         float64 = 0
+	unit                    = 1.0
+	selectedTexture         = 5
+	lastBracket     bool
+	lastNumberKey   bool
 )
 
 func dist(x0, y0, x1, y1 float64) float64 {
@@ -84,21 +84,69 @@ func processInputs() {
 	}
 
 	if window.GetKey(glfw.KeyLeftBracket) == glfw.Press {
-		if !lastLeftBracket {
+		if !lastBracket {
 			selectedTexture = (selectedTexture + 1) % textureCount
-			lastLeftBracket = true
+			lastBracket = true
+		}
+	} else if window.GetKey(glfw.KeyRightBracket) == glfw.Press {
+		if !lastBracket {
+			selectedTexture = (selectedTexture + textureCount - 1) % textureCount
+			lastBracket = true
 		}
 	} else {
-		lastLeftBracket = false
+		lastBracket = false
 	}
 
-	if window.GetKey(glfw.KeyRightBracket) == glfw.Press {
-		if !lastRightBracket {
-			selectedTexture = (selectedTexture + textureCount - 1) % textureCount
-			lastRightBracket = true
+	if cursorX >= 0 && cursorY >= 0 && cursorZ >= 0 &&
+		cursorX < MAP_SIZE && cursorY < MAP_HEIGHT && cursorZ < MAP_SIZE {
+		if window.GetKey(glfw.Key1) == glfw.Press {
+			if !lastNumberKey {
+				grid[cursorX][cursorZ].cellType = WALL
+				lastNumberKey = true
+			}
+		} else if window.GetKey(glfw.Key2) == glfw.Press {
+			if !lastNumberKey {
+				grid[cursorX][cursorZ].cellType = CORRIDOR
+				lastNumberKey = true
+			}
+		} else if window.GetKey(glfw.Key3) == glfw.Press {
+			if !lastNumberKey {
+				grid[cursorX][cursorZ].cellType = LOW_ROOM
+				lastNumberKey = true
+			}
+		} else if window.GetKey(glfw.Key4) == glfw.Press {
+			if !lastNumberKey {
+				grid[cursorX][cursorZ].cellType = HIGH_ROOM
+				lastNumberKey = true
+			}
+		} else if window.GetKey(glfw.Key5) == glfw.Press {
+			if !lastNumberKey {
+				grid[cursorX][cursorZ].cellType = HIGH_ROOM_SINGLE_BLOCK
+				lastNumberKey = true
+			}
+		} else if window.GetKey(glfw.Key6) == glfw.Press {
+			if !lastNumberKey {
+				grid[cursorX][cursorZ].cellType = HIGH_ROOM_DOUBLE_BLOCK
+				lastNumberKey = true
+			}
+		} else if window.GetKey(glfw.Key8) == glfw.Press {
+			if !lastNumberKey {
+				grid[cursorX][cursorZ].cellType = SKY_DOUBLE_BLOCK
+				lastNumberKey = true
+			}
+		} else if window.GetKey(glfw.Key9) == glfw.Press {
+			if !lastNumberKey {
+				grid[cursorX][cursorZ].cellType = SKY_SINGLE_BLOCK
+				lastNumberKey = true
+			}
+		} else if window.GetKey(glfw.Key0) == glfw.Press {
+			if !lastNumberKey {
+				grid[cursorX][cursorZ].cellType = SKY
+				lastNumberKey = true
+			}
+		} else {
+			lastNumberKey = false
 		}
-	} else {
-		lastRightBracket = false
 	}
 
 	if myY < 0.5 {
