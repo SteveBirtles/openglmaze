@@ -16,6 +16,7 @@ const vertexShader = `#version 300 es
 uniform mat4 projection;
 uniform mat4 camera;
 uniform mat4 model;
+uniform vec3 position;
 
 in vec3 vertexIn;
 in vec2 texCoordIn;
@@ -26,8 +27,10 @@ out mediump vec3 colourForFrag;
 
 void main() {
 
+	float illumination = min(0.5, 1.0 - length(vertexIn - position) / 16.0);
+
     texCoordForFrag = texCoordIn;
-    colourForFrag = colourIn;
+    colourForFrag = colourIn * illumination;
 
     gl_Position = projection * camera * model * vec4(vertexIn, 1);
 

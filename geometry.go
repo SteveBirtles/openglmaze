@@ -8,7 +8,8 @@ const texZero = 0.0
 const texOne = 1.0
 
 var (
-	vertices [textureCount][]float32
+	vertices     [textureCount][]float32
+	verticesTemp [textureCount][]float32
 
 	cubeBottom = []float32{ //blue
 		1.0, 0.0, 0.0, texOne, texZero,
@@ -75,23 +76,23 @@ func processVertex(v float32, index int, coords []int, texture int, rgb []float3
 	if index%5 < 3 {
 		v += float32(coords[index%5])
 	}
-	vertices[texture] = append(vertices[texture], v)
+	verticesTemp[texture] = append(verticesTemp[texture], v)
 	if index%5 == 4 {
 		if selectedStack {
-			vertices[texture] = append(vertices[texture], 1.0, 1.0, 1.0)
+			verticesTemp[texture] = append(verticesTemp[texture], 1.0, 1.0, 1.0)
 		} else {
-			vertices[texture] = append(vertices[texture], rgb...)
+			verticesTemp[texture] = append(verticesTemp[texture], rgb...)
 		}
 	}
 
 }
 
-func prepareVertices() {
+func updateWorld() {
 
-	const drawDistance float64 = 32
+	const drawDistance float64 = 16
 
 	for i := 0; i < textureCount; i++ {
-		vertices[i] = make([]float32, 0)
+		verticesTemp[i] = make([]float32, 0)
 	}
 
 	for x := int(math.Floor(myX) - drawDistance); x < int(math.Floor(myX)+drawDistance); x++ {
@@ -122,10 +123,10 @@ func prepareVertices() {
 					wallBit = CEILING_BIT
 				}
 
-				d := dist(float64(x), float64(z), myX, myZ)
-				illumination := float32(math.Min(0.5, 1-d/drawDistance))
-
-				ambient := []float32{illumination, illumination, illumination}
+				//d := dist(float64(x), float64(z), myX, myZ)
+				//illumination := float32(math.Min(0.5, 1-d/drawDistance))
+				//ambient := []float32{illumination, illumination, illumination}
+				ambient := []float32{1, 1, 1}
 
 				isStack := cursorX == x && cursorZ == z
 
@@ -180,5 +181,7 @@ func prepareVertices() {
 
 		}
 	}
+
+	vertices = verticesTemp
 
 }

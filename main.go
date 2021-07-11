@@ -15,6 +15,7 @@ const fullScreen = false
 var (
 	frames            = 0
 	second            = time.Tick(time.Second)
+	tenth             = time.Tick(time.Millisecond * 100)
 	frameLength       float64
 	windowTitlePrefix = "OpenGL Maze Experiment"
 	window            *glfw.Window
@@ -40,7 +41,12 @@ func main() {
 		processInputs()
 		cursorX, cursorY, cursorZ, cursorWall, cursorTexture = evaluateCursor()
 
-		prepareVertices()
+		select {
+		case <-tenth:
+			go updateWorld()
+		default:
+		}
+
 		renderWorld()
 
 		glfw.PollEvents()
@@ -48,7 +54,7 @@ func main() {
 		select {
 		case <-second:
 			window.SetTitle(fmt.Sprintf("%s | FPS: %d", windowTitlePrefix, frames))
-			//fmt.Printf("FPS: %d\tPlayer x: %v, y: %v, z: %v\n", frames, myX, myY, myZ)
+			fmt.Printf("FPS: %d\tPlayer x: %v, y: %v, z: %v\n", frames, myX, myY, myZ)
 			frames = 0
 		default:
 		}

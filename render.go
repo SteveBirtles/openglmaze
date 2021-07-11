@@ -19,6 +19,9 @@ func renderWorld() {
 	cameraUniform := gl.GetUniformLocation(shaderProgram, gl.Str("camera\x00"))
 	gl.UniformMatrix4fv(cameraUniform, 1, false, &camera[0])
 
+	positionUniform := gl.GetUniformLocation(shaderProgram, gl.Str("position\x00"))
+	gl.Uniform3f(positionUniform, position.X(), position.Y(), position.Z())
+
 	for i := 0; i < textureCount; i++ {
 
 		if len(vertices[i]) > 0 {
