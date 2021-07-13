@@ -71,7 +71,7 @@ func processInputs() {
 			cursorX < MAP_SIZE && cursorY < MAP_HEIGHT && cursorZ < MAP_SIZE {
 			if cursorWall == -1 {
 				grid[cursorX][cursorZ].flats[cursorY] = selectedTexture
-			} else if cursorWall >= 0 && cursorWall < 4 {
+			} else if cursorWall >= 0 && cursorWall < 4 && cursorY < len(grid[cursorX][cursorZ].walls) {
 				grid[cursorX][cursorZ].walls[cursorY][cursorWall] = selectedTexture
 			}
 		}

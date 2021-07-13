@@ -7,9 +7,19 @@ import (
 const texZero = 0.0
 const texOne = 1.0
 
+type vertexRecord struct {
+	texture int
+	index   int
+	x       int
+	y       int
+	z       int
+	wall    int
+}
+
 var (
-	vertices     [textureCount][]float32
-	verticesTemp [textureCount][]float32
+	vertices [textureCount][]float32
+
+	vertexRecords []vertexRecord
 
 	cubeBottom = []float32{ //blue
 		1.0, 0.0, 0.0, texOne, texZero,
@@ -67,22 +77,25 @@ var (
 	}
 )
 
-func processVertex(v float32, index int, coords []int, texture int, rgb []float32, selectedStack bool, selectedSurface bool) {
-
-	if selectedStack && selectedSurface && selectedTexture > 0 && selectedTexture <= textureCount {
-		texture = selectedTexture - 1
-	}
+func processVertex(v float32, index int, coords []int, texture int, rgb []float32, wall int) {
 
 	if index%5 < 3 {
 		v += float32(coords[index%5])
 	}
-	verticesTemp[texture] = append(verticesTemp[texture], v)
+	vertices[texture] = append(vertices[texture], v)
 	if index%5 == 4 {
-		if selectedStack {
-			verticesTemp[texture] = append(verticesTemp[texture], 1.0, 1.0, 1.0)
-		} else {
-			verticesTemp[texture] = append(verticesTemp[texture], rgb...)
-		}
+
+		vertices[texture] = append(vertices[texture], rgb...)
+
+		vertexRecords = append(vertexRecords, vertexRecord{
+			index:   len(vertices[texture]) - 7,
+			texture: texture,
+			x:       coords[0],
+			y:       coords[1],
+			z:       coords[2],
+			wall:    wall,
+		})
+
 	}
 
 }
@@ -92,8 +105,10 @@ func updateWorld() {
 	const drawDistance float64 = 16
 
 	for i := 0; i < textureCount; i++ {
-		verticesTemp[i] = make([]float32, 0)
+		vertices[i] = make([]float32, 0)
 	}
+
+	vertexRecords = make([]vertexRecord, 0)
 
 	for x := int(math.Floor(myX) - drawDistance); x < int(math.Floor(myX)+drawDistance); x++ {
 		for z := int(math.Floor(myZ) - drawDistance); z < int(math.Floor(myZ)+drawDistance); z++ {
@@ -123,28 +138,21 @@ func updateWorld() {
 					wallBit = CEILING_BIT
 				}
 
-				//d := dist(float64(x), float64(z), myX, myZ)
-				//illumination := float32(math.Min(0.5, 1-d/drawDistance))
-				//ambient := []float32{illumination, illumination, illumination}
-				ambient := []float32{1, 1, 1}
-
-				isStack := cursorX == x && cursorZ == z
+				ambient := []float32{0.666, 0.666, 0.666}
 
 				flatTexture := int(grid[x][z].flats[y]) - 1
 
 				if flatTexture != -1 && grid[x][z].cellType&flatBit > 0 {
 					if y < MAP_HEIGHT-1 && grid[x][z].cellType&wallBit == 0 {
 						for i, v := range cubeBottom {
-							processVertex(v, i, coords, flatTexture, ambient,
-								isStack, cursorY == y && cursorWall == -1) //[]float32{0.0, 0.0, ambient[2]})
+							processVertex(v, i, coords, flatTexture, ambient, -1)
 						}
 					}
 				}
 
 				if flatTexture != -1 && grid[x][z].cellType&flatBit == 0 && grid[x][z].cellType&wallBit > 0 {
 					for i, v := range cubeFlippedBottom {
-						processVertex(v, i, coords, flatTexture, ambient,
-							isStack, cursorY == y && cursorWall == -1) //[]float32{ambient[0], 0.0, ambient[2]})
+						processVertex(v, i, coords, flatTexture, ambient, -1)
 					}
 				}
 
@@ -154,26 +162,22 @@ func updateWorld() {
 
 				if (x == 0 || x > 0 && grid[x-1][z].cellType&wallBit == 0) && int(grid[x][z].walls[y][0]) > 0 {
 					for i, v := range cubeLeft {
-						processVertex(v, i, coords, int(grid[x][z].walls[y][0])-1, ambient,
-							isStack, cursorY == y && cursorWall == 0) //[]float32{ambient[0], 0.0, 0.0})
+						processVertex(v, i, coords, int(grid[x][z].walls[y][0])-1, ambient, 0)
 					}
 				}
 				if (x == MAP_SIZE-1 || x < MAP_SIZE-1 && grid[x+1][z].cellType&wallBit == 0) && int(grid[x][z].walls[y][1]) > 0 {
 					for i, v := range cubeRight {
-						processVertex(v, i, coords, int(grid[x][z].walls[y][1])-1, ambient,
-							isStack, cursorY == y && cursorWall == 1) //[]float32{ambient[0], ambient[1], 0.0})
+						processVertex(v, i, coords, int(grid[x][z].walls[y][1])-1, ambient, 1)
 					}
 				}
 				if (z == 0 || z > 0 && grid[x][z-1].cellType&wallBit == 0) && int(grid[x][z].walls[y][2]) > 0 {
 					for i, v := range cubeLightSide {
-						processVertex(v, i, coords, int(grid[x][z].walls[y][2])-1, ambient,
-							isStack, cursorY == y && cursorWall == 2) //[]float32{0.0, ambient[1], 0.0})
+						processVertex(v, i, coords, int(grid[x][z].walls[y][2])-1, ambient, 2)
 					}
 				}
 				if (z == MAP_SIZE-1 || z < MAP_SIZE-1 && grid[x][z+1].cellType&wallBit == 0) && int(grid[x][z].walls[y][3]) > 0 {
 					for i, v := range cubeDarkSide {
-						processVertex(v, i, coords, int(grid[x][z].walls[y][3])-1, ambient,
-							isStack, cursorY == y && cursorWall == 3) //[]float32{0.0, ambient[1], ambient[2]})
+						processVertex(v, i, coords, int(grid[x][z].walls[y][3])-1, ambient, 3)
 					}
 				}
 
@@ -181,7 +185,5 @@ func updateWorld() {
 
 		}
 	}
-
-	vertices = verticesTemp
 
 }
