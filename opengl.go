@@ -9,8 +9,10 @@ import (
 )
 
 var (
-	vertexBuffer uint32
-	vertexArray  uint32
+	triangleVertexBuffer uint32
+	triangleVertexArray  uint32
+	lineVertexBuffer     uint32
+	lineVertexArray      uint32
 )
 
 func init() {
@@ -60,10 +62,10 @@ func initiateOpenGL() {
 	gl.Enable(gl.CULL_FACE)
 	gl.ClearColor(0.0, 0.0, 0.0, 1.0)
 
-	gl.GenVertexArrays(1, &vertexArray)
-	gl.BindVertexArray(vertexArray)
+	gl.GenVertexArrays(1, &triangleVertexArray)
+	gl.GenBuffers(1, &triangleVertexBuffer)
 
-	gl.GenBuffers(1, &vertexBuffer)
-	gl.BindBuffer(gl.ARRAY_BUFFER, vertexBuffer)
+	gl.GenVertexArrays(1, &lineVertexArray)
+	gl.GenBuffers(1, &lineVertexBuffer)
 
 }

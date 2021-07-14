@@ -6,7 +6,6 @@ import (
 
 const texZero = 0.0
 const texOne = 1.0
-const drawDistance float64 = 16
 
 type vertexRecord struct {
 	texture int

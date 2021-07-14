@@ -12,6 +12,8 @@ func renderWorld() {
 	gl.Clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT)
 
 	gl.UseProgram(triangleShaderProgram)
+	gl.BindVertexArray(triangleVertexArray)
+	gl.BindBuffer(gl.ARRAY_BUFFER, triangleVertexBuffer)
 
 	position := mgl32.Vec3{float32(myX), float32(myY), float32(myZ)}
 	focus := mgl32.Vec3{
@@ -39,7 +41,7 @@ func renderWorld() {
 
 			gl.ActiveTexture(gl.TEXTURE0)
 			gl.BindTexture(gl.TEXTURE_2D, texture[i])
-			gl.DrawArrays(gl.TRIANGLES, 0, int32(len(vertices[i])))
+			gl.DrawArrays(gl.TRIANGLES, 0, int32(len(vertices[i]))/8)
 
 		}
 
@@ -55,20 +57,31 @@ func renderWorld() {
 		gl.BufferData(gl.ARRAY_BUFFER, len(cursorVertices)*4, gl.Ptr(cursorVertices), gl.STATIC_DRAW)
 
 		gl.ActiveTexture(gl.TEXTURE0)
-		gl.BindTexture(gl.TEXTURE_2D, texture[(selectedTexture+textureCount-1)%textureCount])
-		gl.DrawArrays(gl.TRIANGLES, 0, int32(len(cursorVertices)))
+		gl.BindTexture(gl.TEXTURE_2D, texture[selectedTexture-1])
+		gl.DrawArrays(gl.TRIANGLES, 0, int32(len(cursorVertices))/8)
 
 	}
 
 	gl.Disable(gl.BLEND)
 
 	gl.UseProgram(lineShaderProgram)
+	gl.BindVertexArray(lineVertexArray)
+	gl.BindBuffer(gl.ARRAY_BUFFER, lineVertexBuffer)
 
-	lineVertices := []float32{-100, -100, 100, -100}
+	lineVertices := []float32{
+		0, -30, 0, -15,
+		-30, 0, -15, 0,
+		0, 30, 0, 15,
+		30, 0, 15, 0,
+	}
+	lineColour := []float32{0, 1, 0}
+
+	lineColourUniform := gl.GetUniformLocation(lineShaderProgram, gl.Str("colour"+terminator))
+	gl.Uniform3f(lineColourUniform, lineColour[0], lineColour[1], lineColour[2])
 
 	gl.BufferData(gl.ARRAY_BUFFER, len(lineVertices)*4, gl.Ptr(lineVertices), gl.STATIC_DRAW)
 
-	gl.DrawArrays(gl.LINES, 0, int32(len(lineVertices)))
+	gl.DrawArrays(gl.LINES, 0, int32(len(lineVertices))/2)
 
 	gl.Enable(gl.DEPTH_TEST)
 

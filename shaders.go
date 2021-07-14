@@ -61,13 +61,14 @@ void main() {
 
 const lineVertexShader = `#version 300 es
 
-uniform mat4 MVP;
+uniform mat4 projection;
+uniform mat4 matrix;
 
-in mediump vec2 aPos;
+in vec2 vertex;
 
 void main() {
 
-	gl_Position = MVP * vec4(aPos.x, 0.0, aPos.y, 1.0);
+	gl_Position = projection * matrix * vec4(vertex.x, vertex.y, 0.0, 1.0);
 
 }`
 
@@ -93,6 +94,8 @@ func prepareShaders() {
 	}
 
 	gl.UseProgram(triangleShaderProgram)
+	gl.BindVertexArray(triangleVertexArray)
+	gl.BindBuffer(gl.ARRAY_BUFFER, triangleVertexBuffer)
 
 	projection := mgl32.Perspective(mgl32.DegToRad(45.0), float32(windowWidth)/windowHeight, 0.1, 5000.0)
 	projectionUniform := gl.GetUniformLocation(triangleShaderProgram, gl.Str("projection"+terminator))
@@ -123,27 +126,24 @@ func prepareShaders() {
 	}
 
 	gl.UseProgram(lineShaderProgram)
+	gl.BindVertexArray(lineVertexArray)
+	gl.BindBuffer(gl.ARRAY_BUFFER, lineVertexBuffer)
 
-	position := mgl32.Vec3{0, 0, -1}
-	focus := mgl32.Vec3{0, 0, 0}
-	up := mgl32.Vec3{0, 1, 0}
+	orthoProjection := mgl32.Ortho(-float32(windowWidth)/2, float32(windowWidth)/2, -float32(windowHeight)/2, float32(windowHeight)/2, 0, 100)
+	orthoProjectionUniform := gl.GetUniformLocation(lineShaderProgram, gl.Str("projection"+terminator))
+	gl.UniformMatrix4fv(orthoProjectionUniform, 1, false, &orthoProjection[0])
+
+	position := mgl32.Vec3{0, 0, 0}
+	focus := mgl32.Vec3{0, 0, 100}
+	up := mgl32.Vec3{0, 100, 0}
 	orthoCamera := mgl32.LookAtV(position, focus, up)
 
-	fmt.Printf("%v\t%v\t%v\t%v\n%v\t%v\t%v\t%v\n%v\t%v\t%v\t%v\n%v\t%v\t%v\t%v\n",
-		orthoCamera.At(0, 0), orthoCamera.At(1, 0), orthoCamera.At(2, 0), orthoCamera.At(3, 0),
-		orthoCamera.At(0, 1), orthoCamera.At(1, 1), orthoCamera.At(2, 1), orthoCamera.At(3, 1),
-		orthoCamera.At(0, 2), orthoCamera.At(1, 2), orthoCamera.At(2, 2), orthoCamera.At(3, 2),
-		orthoCamera.At(0, 3), orthoCamera.At(1, 3), orthoCamera.At(2, 3), orthoCamera.At(3, 3))
+	matrixUniform := gl.GetUniformLocation(lineShaderProgram, gl.Str("matrix"+terminator))
+	gl.UniformMatrix4fv(matrixUniform, 1, false, &orthoCamera[0])
 
-	mvpUniform := gl.GetUniformLocation(lineShaderProgram, gl.Str("MVP"+terminator))
-	gl.UniformMatrix4fv(mvpUniform, 1, false, &orthoCamera[0])
-
-	lineColour := []float32{1, 1, 1}
-
-	lineColourUniform := gl.GetUniformLocation(lineShaderProgram, gl.Str("colour"+terminator))
-	gl.Uniform3f(lineColourUniform, lineColour[0], lineColour[1], lineColour[2])
-
-	//	glUniform3fv(glGetUniformLocation(shaderProgram, "color"), 1, &lineColor[0]);
+	lineVertexIn := uint32(gl.GetAttribLocation(lineShaderProgram, gl.Str("vertex"+terminator)))
+	gl.EnableVertexAttribArray(lineVertexIn)
+	gl.VertexAttribPointer(lineVertexIn, 2, gl.FLOAT, false, 2*4, gl.PtrOffset(0))
 
 }
 

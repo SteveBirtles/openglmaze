@@ -14,8 +14,9 @@ var (
 	bearing         float64 = 0
 	unit                    = 1.0
 	selectedTexture         = 1
-	lastBracket     bool
+	lastSpecial     bool
 	lastNumberKey   bool
+	drawDistance    float64 = 16
 )
 
 func dist(x0, y0, x1, y1 float64) float64 {
@@ -83,18 +84,40 @@ func processInputs() {
 		}
 	}
 
-	if window.GetKey(glfw.KeyLeftBracket) == glfw.Press {
-		if !lastBracket {
-			selectedTexture = (selectedTexture + 1) % textureCount
-			lastBracket = true
+	if window.GetKey(glfw.KeyRightBracket) == glfw.Press {
+		if !lastSpecial {
+			selectedTexture++
+			if selectedTexture > textureCount {
+				selectedTexture = 1
+			}
+			lastSpecial = true
 		}
-	} else if window.GetKey(glfw.KeyRightBracket) == glfw.Press {
-		if !lastBracket {
-			selectedTexture = (selectedTexture + textureCount - 1) % textureCount
-			lastBracket = true
+	} else if window.GetKey(glfw.KeyLeftBracket) == glfw.Press {
+		if !lastSpecial {
+			selectedTexture--
+			if selectedTexture < 1 {
+				selectedTexture = textureCount
+			}
+			lastSpecial = true
+		}
+	} else if window.GetKey(glfw.KeyPageUp) == glfw.Press {
+		if !lastSpecial {
+			drawDistance++
+			if drawDistance > float64(MAP_SIZE) {
+				drawDistance = float64(MAP_SIZE)
+			}
+			lastSpecial = true
+		}
+	} else if window.GetKey(glfw.KeyPageDown) == glfw.Press {
+		if !lastSpecial {
+			drawDistance--
+			if drawDistance < 1 {
+				drawDistance = 1
+			}
+			lastSpecial = true
 		}
 	} else {
-		lastBracket = false
+		lastSpecial = false
 	}
 
 	if cursorX >= 0 && cursorY >= 0 && cursorZ >= 0 &&
