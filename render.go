@@ -22,7 +22,7 @@ func renderWorld() {
 	positionUniform := gl.GetUniformLocation(shaderProgram, gl.Str("position\x00"))
 	gl.Uniform3f(positionUniform, position.X(), position.Y(), position.Z())
 
-	for i := 0; i < textureCount; i++ {
+	for i := 0; i < len(vertices); i++ {
 
 		if len(vertices[i]) > 0 {
 
@@ -35,6 +35,20 @@ func renderWorld() {
 		}
 
 	}
+
+	gl.Disable(gl.DEPTH_TEST)
+
+	if len(cursorVertices) > 0 {
+
+		gl.BufferData(gl.ARRAY_BUFFER, len(cursorVertices)*4, gl.Ptr(cursorVertices), gl.STATIC_DRAW)
+
+		gl.ActiveTexture(gl.TEXTURE0)
+		gl.BindTexture(gl.TEXTURE_2D, texture[selectedTexture])
+		gl.DrawArrays(gl.TRIANGLES, 0, int32(len(cursorVertices)))
+
+	}
+
+	gl.Enable(gl.DEPTH_TEST)
 
 	window.SwapBuffers()
 

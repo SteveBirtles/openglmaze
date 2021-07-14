@@ -6,13 +6,14 @@ import (
 
 const infinity float64 = 100000
 
-func evaluateCursor() (int, int, int, int, int) {
+var cursorVertices []float32
 
-	cursorX := -1
-	cursorY := -1
-	cursorZ := -1
-	cursorWall := -1
-	cursorTexture := -1
+func evaluateCursor() {
+
+	cursorX = -1
+	cursorY = -1
+	cursorZ = -1
+	cursorWall = -1
 
 	dx := math.Cos(bearing) * math.Cos(pitch)
 	dy := math.Sin(pitch)
@@ -148,7 +149,16 @@ func evaluateCursor() (int, int, int, int, int) {
 					cursorTexture = grid[gridX][gridZ].flats[0]
 				}
 
-				return cursorX, cursorY, cursorZ, cursorWall, cursorTexture
+				cursorVertices = make([]float32, 0)
+
+				for _, record := range vertexRecords {
+					if record.x == cursorX && record.y == cursorY && record.z == cursorZ && record.wall == cursorWall {
+						cursorVertices = append(cursorVertices, vertices[record.texture][record.index:record.index+5]...)
+						cursorVertices = append(cursorVertices, []float32{1, 1, 1}...)
+					}
+				}
+
+				return
 
 			}
 
@@ -159,7 +169,5 @@ func evaluateCursor() (int, int, int, int, int) {
 		}
 
 	}
-
-	return -1, -1, -1, -1, -1
 
 }

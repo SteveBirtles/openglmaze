@@ -17,9 +17,13 @@ type vertexRecord struct {
 }
 
 var (
-	vertices [textureCount][]float32
+	vertices     [][]float32
+	verticesTemp [][]float32
 
-	vertexRecords []vertexRecord
+	vertexRecords     []vertexRecord
+	vertexRecordsTemp []vertexRecord
+
+	vertexMutex = false
 
 	cubeBottom = []float32{ //blue
 		1.0, 0.0, 0.0, texOne, texZero,
@@ -82,13 +86,13 @@ func processVertex(v float32, index int, coords []int, texture int, rgb []float3
 	if index%5 < 3 {
 		v += float32(coords[index%5])
 	}
-	vertices[texture] = append(vertices[texture], v)
+	verticesTemp[texture] = append(verticesTemp[texture], v)
 	if index%5 == 4 {
 
-		vertices[texture] = append(vertices[texture], rgb...)
+		verticesTemp[texture] = append(verticesTemp[texture], rgb...)
 
-		vertexRecords = append(vertexRecords, vertexRecord{
-			index:   len(vertices[texture]) - 7,
+		vertexRecordsTemp = append(vertexRecordsTemp, vertexRecord{
+			index:   len(verticesTemp[texture]) - 7,
 			texture: texture,
 			x:       coords[0],
 			y:       coords[1],
@@ -102,13 +106,16 @@ func processVertex(v float32, index int, coords []int, texture int, rgb []float3
 
 func updateWorld() {
 
+	vertexMutex = true
+
 	const drawDistance float64 = 16
 
+	verticesTemp = make([][]float32, textureCount)
 	for i := 0; i < textureCount; i++ {
-		vertices[i] = make([]float32, 0)
+		verticesTemp[i] = make([]float32, 0)
 	}
 
-	vertexRecords = make([]vertexRecord, 0)
+	vertexRecordsTemp = make([]vertexRecord, 0)
 
 	for x := int(math.Floor(myX) - drawDistance); x < int(math.Floor(myX)+drawDistance); x++ {
 		for z := int(math.Floor(myZ) - drawDistance); z < int(math.Floor(myZ)+drawDistance); z++ {
@@ -185,5 +192,7 @@ func updateWorld() {
 
 		}
 	}
+
+	vertexMutex = false
 
 }
