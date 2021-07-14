@@ -6,6 +6,7 @@ import (
 
 const texZero = 0.0
 const texOne = 1.0
+const drawDistance float64 = 16
 
 type vertexRecord struct {
 	texture int
@@ -92,7 +93,7 @@ func processVertex(v float32, index int, coords []int, texture int, rgb []float3
 		verticesTemp[texture] = append(verticesTemp[texture], rgb...)
 
 		vertexRecordsTemp = append(vertexRecordsTemp, vertexRecord{
-			index:   len(verticesTemp[texture]) - 7,
+			index:   len(verticesTemp[texture]) - 8,
 			texture: texture,
 			x:       coords[0],
 			y:       coords[1],
@@ -107,8 +108,6 @@ func processVertex(v float32, index int, coords []int, texture int, rgb []float3
 func updateWorld() {
 
 	vertexMutex = true
-
-	const drawDistance float64 = 16
 
 	verticesTemp = make([][]float32, textureCount)
 	for i := 0; i < textureCount; i++ {

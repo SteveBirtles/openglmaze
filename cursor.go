@@ -153,7 +153,9 @@ func evaluateCursor() {
 
 				for _, record := range vertexRecords {
 					if record.x == cursorX && record.y == cursorY && record.z == cursorZ && record.wall == cursorWall {
-						cursorVertices = append(cursorVertices, vertices[record.texture][record.index:record.index+5]...)
+						for i := 0; i < 5; i++ {
+							cursorVertices = append(cursorVertices, vertices[record.texture][record.index+i])
+						}
 						cursorVertices = append(cursorVertices, []float32{1, 1, 1}...)
 					}
 				}

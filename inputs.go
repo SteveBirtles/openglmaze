@@ -13,7 +13,7 @@ var (
 	pitch           float64 = 0
 	bearing         float64 = 0
 	unit                    = 1.0
-	selectedTexture         = 5
+	selectedTexture         = 1
 	lastBracket     bool
 	lastNumberKey   bool
 )

@@ -17,6 +17,7 @@ uniform mat4 projection;
 uniform mat4 camera;
 uniform mat4 model;
 uniform vec3 position;
+uniform float drawDistance;
 
 in vec3 vertexIn;
 in vec2 texCoordIn;
@@ -26,8 +27,8 @@ out mediump vec2 texCoordForFrag;
 out mediump vec3 colourForFrag;
 
 void main() {
-
-	float illumination = min(0.5, 1.0 - length(vertexIn - position) / 16.0);
+	
+	float illumination = min(0.666667, 1.0 - length(vertexIn - position) / drawDistance);
 
     texCoordForFrag = texCoordIn;
     colourForFrag = colourIn * illumination;
