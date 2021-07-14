@@ -1,10 +1,8 @@
 package main
 
 import (
-	"fmt"
 	"log"
 	"runtime"
-	"strings"
 
 	gl "github.com/go-gl/gl/v3.1/gles2"
 	"github.com/go-gl/glfw/v3.3/glfw"
@@ -67,67 +65,5 @@ func initiateOpenGL() {
 
 	gl.GenBuffers(1, &vertexBuffer)
 	gl.BindBuffer(gl.ARRAY_BUFFER, vertexBuffer)
-
-}
-
-func newShaderProgram(vertexShaderSource, fragmentShaderSource string) (uint32, error) {
-
-	vertexShader, err := compileShader(vertexShaderSource+terminator, gl.VERTEX_SHADER)
-	if err != nil {
-		return 0, err
-	}
-
-	fragmentShader, err := compileShader(fragmentShaderSource+terminator, gl.FRAGMENT_SHADER)
-	if err != nil {
-		return 0, err
-	}
-
-	shaderProgram = gl.CreateProgram()
-
-	gl.AttachShader(shaderProgram, vertexShader)
-	gl.AttachShader(shaderProgram, fragmentShader)
-	gl.LinkProgram(shaderProgram)
-
-	var status int32
-	gl.GetProgramiv(shaderProgram, gl.LINK_STATUS, &status)
-	if status == gl.FALSE {
-		var logLength int32
-		gl.GetProgramiv(shaderProgram, gl.INFO_LOG_LENGTH, &logLength)
-
-		log := strings.Repeat(terminator, int(logLength+1))
-		gl.GetProgramInfoLog(shaderProgram, logLength, nil, gl.Str(log))
-
-		return 0, fmt.Errorf("failed to link shaderProgram: %v", log)
-	}
-
-	gl.DeleteShader(vertexShader)
-	gl.DeleteShader(fragmentShader)
-
-	return shaderProgram, nil
-
-}
-
-func compileShader(source string, shaderType uint32) (uint32, error) {
-
-	shader := gl.CreateShader(shaderType)
-
-	csources, free := gl.Strs(source)
-	gl.ShaderSource(shader, 1, csources, nil)
-	free()
-	gl.CompileShader(shader)
-
-	var status int32
-	gl.GetShaderiv(shader, gl.COMPILE_STATUS, &status)
-	if status == gl.FALSE {
-		var logLength int32
-		gl.GetShaderiv(shader, gl.INFO_LOG_LENGTH, &logLength)
-
-		log := strings.Repeat(terminator, int(logLength+1))
-		gl.GetShaderInfoLog(shader, logLength, nil, gl.Str(log))
-
-		return 0, fmt.Errorf("failed to compile %v: %v", source, log)
-	}
-
-	return shader, nil
 
 }

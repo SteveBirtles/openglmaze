@@ -11,6 +11,8 @@ func renderWorld() {
 
 	gl.Clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT)
 
+	gl.UseProgram(triangleShaderProgram)
+
 	position := mgl32.Vec3{float32(myX), float32(myY), float32(myZ)}
 	focus := mgl32.Vec3{
 		float32(myX + 10*math.Cos(bearing)*math.Cos(pitch)),
@@ -20,13 +22,13 @@ func renderWorld() {
 	up := mgl32.Vec3{0, 1, 0}
 	camera := mgl32.LookAtV(position, focus, up)
 
-	cameraUniform := gl.GetUniformLocation(shaderProgram, gl.Str("camera\x00"))
+	cameraUniform := gl.GetUniformLocation(triangleShaderProgram, gl.Str("camera\x00"))
 	gl.UniformMatrix4fv(cameraUniform, 1, false, &camera[0])
 
-	positionUniform := gl.GetUniformLocation(shaderProgram, gl.Str("position\x00"))
+	positionUniform := gl.GetUniformLocation(triangleShaderProgram, gl.Str("position\x00"))
 	gl.Uniform3f(positionUniform, position.X(), position.Y(), position.Z())
 
-	drawDistanceUniform := gl.GetUniformLocation(shaderProgram, gl.Str("drawDistance\x00"))
+	drawDistanceUniform := gl.GetUniformLocation(triangleShaderProgram, gl.Str("drawDistance\x00"))
 	gl.Uniform1f(drawDistanceUniform, float32(drawDistance))
 
 	for i := 0; i < len(vertices); i++ {
@@ -58,8 +60,17 @@ func renderWorld() {
 
 	}
 
-	gl.Enable(gl.DEPTH_TEST)
 	gl.Disable(gl.BLEND)
+
+	gl.UseProgram(lineShaderProgram)
+
+	lineVertices := []float32{-100, -100, 100, -100}
+
+	gl.BufferData(gl.ARRAY_BUFFER, len(lineVertices)*4, gl.Ptr(lineVertices), gl.STATIC_DRAW)
+
+	gl.DrawArrays(gl.LINES, 0, int32(len(lineVertices)))
+
+	gl.Enable(gl.DEPTH_TEST)
 
 	window.SwapBuffers()
 

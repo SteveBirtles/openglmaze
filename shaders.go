@@ -1,7 +1,9 @@
 package main
 
 import (
+	"fmt"
 	_ "image/png"
+	"strings"
 
 	gl "github.com/go-gl/gl/v3.1/gles2"
 	"github.com/go-gl/mathgl/mgl32"
@@ -9,9 +11,10 @@ import (
 
 const terminator = "\x00"
 
-var shaderProgram uint32
+var triangleShaderProgram uint32
+var lineShaderProgram uint32
 
-const vertexShader = `#version 300 es
+const triangleVertexShader = `#version 300 es
 
 uniform mat4 projection;
 uniform mat4 camera;
@@ -37,7 +40,7 @@ void main() {
 
 }`
 
-const fragmentShader = `#version 300 es
+const triangleFragmentShader = `#version 300 es
 
 uniform sampler2D tex;
 
@@ -56,39 +59,152 @@ void main() {
 
 }`
 
+const lineVertexShader = `#version 300 es
+
+uniform mat4 MVP;
+
+in mediump vec2 aPos;
+
+void main() {
+
+	gl_Position = MVP * vec4(aPos.x, 0.0, aPos.y, 1.0);
+
+}`
+
+const lineFragmentShader = `#version 300 es
+
+uniform mediump vec3 colour;
+
+out mediump vec4 FragColour;
+
+void main() {
+	
+   FragColour = vec4(colour, 1.0f);
+
+}`
+
 func prepareShaders() {
 
 	var err error
 
-	shaderProgram, err = newShaderProgram(vertexShader, fragmentShader)
+	triangleShaderProgram, err = newShaderProgram(triangleVertexShader, triangleFragmentShader)
 	if err != nil {
 		panic(err)
 	}
-	gl.UseProgram(shaderProgram)
+
+	gl.UseProgram(triangleShaderProgram)
 
 	projection := mgl32.Perspective(mgl32.DegToRad(45.0), float32(windowWidth)/windowHeight, 0.1, 5000.0)
-	projectionUniform := gl.GetUniformLocation(shaderProgram, gl.Str("projection"+terminator))
+	projectionUniform := gl.GetUniformLocation(triangleShaderProgram, gl.Str("projection"+terminator))
 	gl.UniformMatrix4fv(projectionUniform, 1, false, &projection[0])
 
 	model := mgl32.Ident4()
-	modelUniform := gl.GetUniformLocation(shaderProgram, gl.Str("model"+terminator))
+	modelUniform := gl.GetUniformLocation(triangleShaderProgram, gl.Str("model"+terminator))
 	gl.UniformMatrix4fv(modelUniform, 1, false, &model[0])
 
-	tex := gl.GetUniformLocation(shaderProgram, gl.Str("tex"+terminator))
+	tex := gl.GetUniformLocation(triangleShaderProgram, gl.Str("tex"+terminator))
 	gl.Uniform1i(tex, 0)
 
-	vertexIn := uint32(gl.GetAttribLocation(shaderProgram, gl.Str("vertexIn"+terminator)))
+	vertexIn := uint32(gl.GetAttribLocation(triangleShaderProgram, gl.Str("vertexIn"+terminator)))
 	gl.EnableVertexAttribArray(vertexIn)
 	gl.VertexAttribPointer(vertexIn, 3, gl.FLOAT, false, 8*4, gl.PtrOffset(0))
 
-	texCoordIn := uint32(gl.GetAttribLocation(shaderProgram, gl.Str("texCoordIn"+terminator)))
+	texCoordIn := uint32(gl.GetAttribLocation(triangleShaderProgram, gl.Str("texCoordIn"+terminator)))
 	gl.EnableVertexAttribArray(texCoordIn)
 	gl.VertexAttribPointer(texCoordIn, 2, gl.FLOAT, false, 8*4, gl.PtrOffset(3*4))
 
-	colourIn := uint32(gl.GetAttribLocation(shaderProgram, gl.Str("colourIn"+terminator)))
+	colourIn := uint32(gl.GetAttribLocation(triangleShaderProgram, gl.Str("colourIn"+terminator)))
 	gl.EnableVertexAttribArray(colourIn)
 	gl.VertexAttribPointer(colourIn, 3, gl.FLOAT, false, 8*4, gl.PtrOffset(5*4))
 
-	gl.BindFragDataLocationEXT(shaderProgram, 0, gl.Str("colourOut"+terminator))
+	lineShaderProgram, err = newShaderProgram(lineVertexShader, lineFragmentShader)
+	if err != nil {
+		panic(err)
+	}
+
+	gl.UseProgram(lineShaderProgram)
+
+	position := mgl32.Vec3{0, 0, -1}
+	focus := mgl32.Vec3{0, 0, 0}
+	up := mgl32.Vec3{0, 1, 0}
+	orthoCamera := mgl32.LookAtV(position, focus, up)
+
+	fmt.Printf("%v\t%v\t%v\t%v\n%v\t%v\t%v\t%v\n%v\t%v\t%v\t%v\n%v\t%v\t%v\t%v\n",
+		orthoCamera.At(0, 0), orthoCamera.At(1, 0), orthoCamera.At(2, 0), orthoCamera.At(3, 0),
+		orthoCamera.At(0, 1), orthoCamera.At(1, 1), orthoCamera.At(2, 1), orthoCamera.At(3, 1),
+		orthoCamera.At(0, 2), orthoCamera.At(1, 2), orthoCamera.At(2, 2), orthoCamera.At(3, 2),
+		orthoCamera.At(0, 3), orthoCamera.At(1, 3), orthoCamera.At(2, 3), orthoCamera.At(3, 3))
+
+	mvpUniform := gl.GetUniformLocation(lineShaderProgram, gl.Str("MVP"+terminator))
+	gl.UniformMatrix4fv(mvpUniform, 1, false, &orthoCamera[0])
+
+	lineColour := []float32{1, 1, 1}
+
+	lineColourUniform := gl.GetUniformLocation(lineShaderProgram, gl.Str("colour"+terminator))
+	gl.Uniform3f(lineColourUniform, lineColour[0], lineColour[1], lineColour[2])
+
+	//	glUniform3fv(glGetUniformLocation(shaderProgram, "color"), 1, &lineColor[0]);
+
+}
+
+func newShaderProgram(vertexShaderSource, fragmentShaderSource string) (uint32, error) {
+
+	vertexShader, err := compileShader(vertexShaderSource+terminator, gl.VERTEX_SHADER)
+	if err != nil {
+		return 0, err
+	}
+
+	fragmentShader, err := compileShader(fragmentShaderSource+terminator, gl.FRAGMENT_SHADER)
+	if err != nil {
+		return 0, err
+	}
+
+	shaderProgram := gl.CreateProgram()
+
+	gl.AttachShader(shaderProgram, vertexShader)
+	gl.AttachShader(shaderProgram, fragmentShader)
+	gl.LinkProgram(shaderProgram)
+
+	var status int32
+	gl.GetProgramiv(shaderProgram, gl.LINK_STATUS, &status)
+	if status == gl.FALSE {
+		var logLength int32
+		gl.GetProgramiv(shaderProgram, gl.INFO_LOG_LENGTH, &logLength)
+
+		log := strings.Repeat(terminator, int(logLength+1))
+		gl.GetProgramInfoLog(shaderProgram, logLength, nil, gl.Str(log))
+
+		return 0, fmt.Errorf("failed to link triangle shader program: %v", log)
+	}
+
+	gl.DeleteShader(vertexShader)
+	gl.DeleteShader(fragmentShader)
+
+	return shaderProgram, nil
+
+}
+
+func compileShader(source string, shaderType uint32) (uint32, error) {
+
+	shader := gl.CreateShader(shaderType)
+
+	csources, free := gl.Strs(source)
+	gl.ShaderSource(shader, 1, csources, nil)
+	free()
+	gl.CompileShader(shader)
+
+	var status int32
+	gl.GetShaderiv(shader, gl.COMPILE_STATUS, &status)
+	if status == gl.FALSE {
+		var logLength int32
+		gl.GetShaderiv(shader, gl.INFO_LOG_LENGTH, &logLength)
+
+		log := strings.Repeat(terminator, int(logLength+1))
+		gl.GetShaderInfoLog(shader, logLength, nil, gl.Str(log))
+
+		return 0, fmt.Errorf("failed to compile %v: %v", source, log)
+	}
+
+	return shader, nil
 
 }
