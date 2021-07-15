@@ -17,13 +17,9 @@ var (
 	second            = time.Tick(time.Second)
 	tenth             = time.Tick(time.Millisecond * 100)
 	frameLength       float64
+	fpsString         = "Caclulating fps..."
 	windowTitlePrefix = "OpenGL Maze Experiment"
 	window            *glfw.Window
-	cursorX           int
-	cursorY           int
-	cursorZ           int
-	cursorTexture     int
-	cursorWall        int
 )
 
 func main() {
@@ -59,7 +55,7 @@ func main() {
 		select {
 		case <-second:
 			window.SetTitle(fmt.Sprintf("%s | FPS: %d", windowTitlePrefix, frames))
-			fmt.Printf("FPS: %d\tPlayer x: %v, y: %v, z: %v\n", frames, myX, myY, myZ)
+			fpsString = fmt.Sprintf("%d FPS", frames)
 			frames = 0
 		default:
 		}

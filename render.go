@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"math"
 
 	gl "github.com/go-gl/gl/v3.1/gles2"
@@ -68,20 +69,26 @@ func renderWorld() {
 	gl.BindVertexArray(lineVertexArray)
 	gl.BindBuffer(gl.ARRAY_BUFFER, lineVertexBuffer)
 
-	lineVertices := []float32{
+	lineColourUniform := gl.GetUniformLocation(lineShaderProgram, gl.Str("colour"+terminator))
+
+	gl.Uniform3f(lineColourUniform, 0, 1, 0)
+
+	cursorLineVertices := []float32{
 		0, -30, 0, -15,
 		-30, 0, -15, 0,
 		0, 30, 0, 15,
 		30, 0, 15, 0,
 	}
-	lineColour := []float32{0, 1, 0}
+	gl.BufferData(gl.ARRAY_BUFFER, len(cursorLineVertices)*4, gl.Ptr(cursorLineVertices), gl.STATIC_DRAW)
+	gl.DrawArrays(gl.LINES, 0, int32(len(cursorLineVertices))/2)
 
-	lineColourUniform := gl.GetUniformLocation(lineShaderProgram, gl.Str("colour"+terminator))
-	gl.Uniform3f(lineColourUniform, lineColour[0], lineColour[1], lineColour[2])
+	gl.Uniform3f(lineColourUniform, 1, 1, 1)
 
-	gl.BufferData(gl.ARRAY_BUFFER, len(lineVertices)*4, gl.Ptr(lineVertices), gl.STATIC_DRAW)
-
-	gl.DrawArrays(gl.LINES, 0, int32(len(lineVertices))/2)
+	drawString(fpsString, -windowWidth/2+20, windowHeight/2-20, 10)
+	drawString(fmt.Sprintf("player %.1f %.1f %.1f  %.2f mark %.2f pi", myX, myY, myZ, bearing/math.Pi, pitch/math.Pi), -windowWidth/2+20, windowHeight/2-50, 10)
+	drawString(fmt.Sprintf("cursor %v %v %v  wall %v tex %v", cursorX, cursorY, cursorZ, cursorWall, cursorTexture), -windowWidth/2+20, windowHeight/2-80, 10)
+	drawString(fmt.Sprintf("texture %v", selectedTexture), -windowWidth/2+20, windowHeight/2-110, 10)
+	drawString(fmt.Sprintf("distance %v", drawDistance), -windowWidth/2+20, windowHeight/2-140, 10)
 
 	gl.Enable(gl.DEPTH_TEST)
 

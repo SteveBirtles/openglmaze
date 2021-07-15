@@ -6,7 +6,14 @@ import (
 
 const infinity float64 = 100000
 
-var cursorVertices []float32
+var (
+	cursorVertices []float32
+	cursorX        int
+	cursorY        int
+	cursorZ        int
+	cursorTexture  int
+	cursorWall     int
+)
 
 func evaluateCursor() {
 

@@ -134,7 +134,7 @@ func prepareShaders() {
 	gl.UniformMatrix4fv(orthoProjectionUniform, 1, false, &orthoProjection[0])
 
 	position := mgl32.Vec3{0, 0, 0}
-	focus := mgl32.Vec3{0, 0, 100}
+	focus := mgl32.Vec3{0, 0, -100}
 	up := mgl32.Vec3{0, 100, 0}
 	orthoCamera := mgl32.LookAtV(position, focus, up)
 
